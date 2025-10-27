@@ -1,115 +1,115 @@
   {
 	  "version": 2.0,
   "questions": [
-    {
-    "question": "1. What does 'pathloss' fundamentally describe in a wireless communication system?",
+   {
+    "question": "1. What is the primary aim of the experiment described in the text?",
     "answers": {
-      "a": "The signal amplification at the transmitter.",
-      "b": "The reduction in signal power density as it propagates through space.",
-      "c": "The speed of the data being transmitted.",
-      "d": "The total power consumed by the receiver."
+      "a": "To measure the maximum transmit power of a base station.",
+      "b": "To understand how various factors affect the downlink Carrier-to-Interference ratio.",
+      "c": "To calculate the exact path loss exponent for a city.",
+      "d": "To design a new type of cellular antenna."
     },
     "correctAnswer": "b",
     "difficulty": "beginner"
   },
   {
-    "question": "2. If the transmitter power is doubled, what is the expected change in the received signal strength, assuming all other factors are constant?",
+    "question": "2. What does 'Tx power of B.S.' refer to?",
     "answers": {
-      "a": "It will be halved.",
-      "b": "It will be squared.",
-      "c": "It will also double (or increase by 3 dB).",
-      "d": "It will not change."
+      "a": "The processing speed of the base station.",
+      "b": "The amount of signal strength the base station transmits.",
+      "c": "The power consumed by the base station's cooling system.",
+      "d": "The total number of users connected to the base station."
+    },
+    "correctAnswer": "b",
+    "difficulty": "beginner"
+  },
+  {
+    "question": "3. Which objective relates to the concept of using the same frequencies in different, separated cells?",
+    "answers": {
+      "a": "Sectoring",
+      "b": "Shadowing effect",
+      "c": "Frequency reuse",
+      "d": "Vertical beam tilt"
     },
     "correctAnswer": "c",
     "difficulty": "beginner"
   },
   {
-    "question": "3. As the distance between the transmitter and receiver increases, what generally happens to the pathloss?",
+    "question": "4. What is 'sectoring' used for in a base station?",
     "answers": {
-      "a": "It decreases.",
-      "b": "It increases.",
-      "c": "It stays the same.",
-      "d": "It becomes zero."
-    },
-    "correctAnswer": "b",
-    "difficulty": "beginner"
-  },
-  {
-    "question": "4. A larger 'pathloss exponent' value typically implies which kind of environment?",
-    "answers": {
-      "a": "An open field with a clear line of sight.",
-      "b": "A dense urban area with many buildings and obstacles.",
-      "c": "A perfect vacuum (free space).",
-      "d": "An environment with no signal loss."
-    },
-    "correctAnswer": "b",
-    "difficulty": "medium"
-  },
-  {
-    "question": "5. In typical propagation models, how does increasing the carrier frequency affect the pathloss for a fixed distance?",
-    "answers": {
-      "a": "It decreases the pathloss.",
-      "b": "It has no effect on the pathloss.",
-      "c": "It increases the pathloss.",
-      "d": "It only affects the signal's speed, not its loss."
-    },
-    "correctAnswer": "c",
-    "difficulty": "medium"
-  },
-  {
-    "question": "6. What is the general effect of increasing the transmitter antenna height on the received signal strength?",
-    "answers": {
-      "a": "It decreases the received signal strength.",
-      "b": "It has no predictable effect.",
-      "c": "It increases the received signal strength, often by clearing obstructions.",
-      "d": "It only changes the signal's frequency."
-    },
-    "correctAnswer": "c",
-    "difficulty": "beginner"
-  },
-  {
-    "question": "7. How does raising the receiver antenna height typically impact the received signal strength?",
-    "answers": {
-      "a": "It generally improves the received signal strength.",
-      "b": "It generally degrades the received signal strength.",
-      "c": "It has no impact on the received signal strength.",
-      "d": "It inverts the phase of the signal."
-    },
-    "correctAnswer": "a",
-    "difficulty": "beginner"
-  },
-  {
-    "question": "8. What is the primary purpose of using a pathloss prediction formula?",
-    "answers": {
-      "a": "To calculate the exact manufacturing cost of a transmitter.",
-      "b": "To estimate the received signal strength at various locations.",
-      "c": "To determine the color of the antenna.",
-      "d": "To measure the speed of light."
-    },
-    "correctAnswer": "b",
-    "difficulty": "medium"
-  },
-  {
-    "question": "9. A pathloss exponent of two is characteristic of what ideal environment?",
-    "answers": {
-      "a": "A dense forest.",
-      "b": "A submarine communication channel.",
-      "c": "An indoor office with many walls.",
-      "d": "Free space, with no obstructions."
-    },
-    "correctAnswer": "d",
-    "difficulty": "medium"
-  },
-  {
-    "question": "10. To find the final received signal strength (in logarithmic units like dBm), the calculated pathloss is typically...",
-    "answers": {
-      "a": "Subtracted from the transmitter power (also in logarithmic units).",
-      "b": "Added to the transmitter power.",
-      "c": "Multiplied by the transmitter power.",
-      "d": "Ignored, as it's not part of the calculation."
+      "a": "To divide a cell into multiple directional segments to reduce interference.",
+      "b": "To connect the cell to different parts of the core network.",
+      "c": "To increase the physical height of the base station tower.",
+      "d": "To assign different frequencies to every single user."
     },
     "correctAnswer": "a",
     "difficulty": "medium"
+  },
+  {
+    "question": "5. What does the 'shadowing effect' describe?",
+    "answers": {
+      "a": "The change in signal strength due to the time of day.",
+      "b": "The signal blockage caused by large obstructions like buildings or hills.",
+      "c": "The interference from adjacent frequency channels.",
+      "d": "The pattern of radio waves cast by the antenna itself."
+    },
+    "correctAnswer": "b",
+    "difficulty": "medium"
+  },
+  {
+    "question": "6. How might changing the 'B.S. height' impact the cell?",
+    "answers": {
+      "a": "It only changes the power consumption of the base station.",
+      "b": "It only affects the path loss exponent.",
+      "c": "It can alter the cell's coverage area and its interference with other cells.",
+      "d": "It has no significant effect on signal propagation."
+    },
+    "correctAnswer": "c",
+    "difficulty": "medium"
+  },
+  {
+    "question": "7. What does the 'path loss exponent' parameter represent?",
+    "answers": {
+      "a": "The rate at which signal strength decreases with distance.",
+      "b": "The total number of paths a signal can take.",
+      "c": "The power level of the transmitted signal.",
+      "d": "The physical angle of the antenna."
+    },
+    "correctAnswer": "a",
+    "difficulty": "advanced"
+  },
+  {
+    "question": "8. What is the purpose of adjusting the 'vertical beam tilt' of an antenna?",
+    "answers": {
+      "a": "To aim the signal more towards the ground or the horizon.",
+      "b": "To change the frequency of the signal.",
+      "c": "To physically rotate the antenna horizontally.",
+      "d": "To switch the antenna between transmit and receive modes."
+    },
+    "correctAnswer": "a",
+    "difficulty": "advanced"
+  },
+  {
+    "question": "9. The experiment aims to study the 'downlink' C/I ratio. What does 'downlink' refer to?",
+    "answers": {
+      "a": "The communication from the mobile phone to the base station.",
+      "b": "The communication from the base station to the mobile phone.",
+      "c": "The connection between two different base stations.",
+      "d": "The signal that has been lost due to shadowing."
+    },
+    "correctAnswer": "b",
+    "difficulty": "medium"
+  },
+  {
+    "question": "10. According to the text, how might a teacher guide this experiment?",
+    "answers": {
+      "a": "By asking students to build their own base station.",
+      "b": "By having students write a new path loss formula.",
+      "c": "By limiting the variables to test, such as focusing only on Tx power.",
+      "d": "By removing all parameters except frequency reuse."
+    },
+    "correctAnswer": "c",
+    "difficulty": "beginner"
   }
 
   ]
