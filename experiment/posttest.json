@@ -1,39 +1,117 @@
-{
-  "version": 2.0,
+
+  {
+	  "version": 2.0,
   "questions": [
     {
-      "question": "This is a Sample Question 1?",
-      "answers": {
-        "a": "answer1",
-        "b": "answer2",
-        "c": "answer3",
-        "d": "answer4"
-      },
-      "explanations": {
-        "a": "Explanation 1  <a href='www.google.com'>here</a>",
-        "b": "Explanation 2",
-        "c": "Explanation 2",
-        "d": "Explanation 2"
-      },
-      "correctAnswer": "a",
-      "difficulty": "beginner"
+    "question": "1. What is the 'cell radius' parameter related to?",
+    "answers": {
+      "a": "The physical size of the base station's antenna.",
+      "b": "The data speed available within the cell.",
+      "c": "The geographic coverage area of a single cell.",
+      "d": "The number of frequencies used in the cell."
     },
-    {
-      "question": "This is a Sample Question 2?",
-      "answers": {
-        "a": "answer1",
-        "b": "answer2",
-        "c": "answer3",
-        "d": "answer4"
-      },
-      "explanations": {
-        "a": "Explanation 1  <a href='www.google.com'>here</a>",
-        "b": "Explanation 2",
-        "c": "Explanation 2",
-        "d": "Explanation 2"
-      },
-      "correctAnswer": "c",
-      "difficulty": "beginner"
-    }
+    "correctAnswer": "c",
+    "difficulty": "beginner"
+  },
+  {
+    "question": "2. A high 'path loss exponent' value implies that the signal strength...",
+    "answers": {
+      "a": "increases rapidly as you move away from the base station.",
+      "b": "is not affected by distance.",
+      "c": "remains constant throughout the cell.",
+      "d": "decreases rapidly as you move away from the base station."
+    },
+    "correctAnswer": "d",
+    "difficulty": "medium"
+  },
+  {
+    "question": "3. Which of these parameters directly relates to signal blockage from physical objects like buildings?",
+    "answers": {
+      "a": "Path loss exponent",
+      "b": "Shadowing effect",
+      "c": "Sectoring",
+      "d": "Vertical beam tilt"
+    },
+    "correctAnswer": "b",
+    "difficulty": "medium"
+  },
+  {
+    "question": "4. Adjusting the 'vertical beam tilt' would be done to...",
+    "answers": {
+      "a": "change the cell's frequency.",
+      "b": "control the up-and-down angle of the signal to focus coverage.",
+      "c": "make the base station tower taller or shorter.",
+      "d": "increase the total transmit power."
+    },
+    "correctAnswer": "b",
+    "difficulty": "advanced"
+  },
+  {
+    "question": "5. What is the C/I ratio a measure of?",
+    "answers": {
+      "a": "The desired signal strength compared to the interference strength.",
+      "b": "The total number of carriers versus the total interference.",
+      "c": "The cell's capacity versus its interference.",
+      "d": "The cost of the base station versus its performance."
+    },
+    "correctAnswer": "a",
+    "difficulty": "medium"
+  },
+  {
+    "question": "6. How would increasing the 'Tx power of B.S.' likely affect its *own* cell's coverage and the interference it causes to *other* cells?",
+    "answers": {
+      "a": "It would decrease its coverage and decrease its interference.",
+      "b": "It would increase its coverage and increase its interference.",
+      "c": "It would increase its coverage but decrease its interference.",
+      "d": "It would decrease its coverage but increase its interference."
+    },
+    "correctAnswer": "b",
+    "difficulty": "advanced"
+  },
+  {
+    "question": "7. The experiment mentions a 'ten percentile SNR'. What does this likely refer to?",
+    "answers": {
+      "a": "The signal quality experienced by the best ten users in the cell.",
+      "b": "The signal quality that is better than ten percent of all measurements.",
+      "c": "The average signal quality of the first ten measurements.",
+      "d": "The signal quality that is only ten percent of the maximum possible."
+    },
+    "correctAnswer": "b",
+    "difficulty": "advanced"
+  },
+  {
+    "question": "8. Which of the listed objectives involves using directional antennas at the base station?",
+    "answers": {
+      "a": "Shadowing effect",
+      "b": "Path loss exponent",
+      "c": "Frequency reuse",
+      "d": "Sectoring"
+    },
+    "correctAnswer": "d",
+    "difficulty": "medium"
+  },
+  {
+    "question": "9. A teacher fixing all parameters except one, like 'transmit power', is an example of...",
+    "answers": {
+      "a": "a poorly designed experiment.",
+      "b": "a controlled experiment to isolate a single variable.",
+      "c": "an experiment to measure the shadowing effect.",
+      "d": "an experiment to test frequency reuse."
+    },
+    "correctAnswer": "b",
+    "difficulty": "beginner"
+  },
+  {
+    "question": "10. Which two parameters are most directly adjusted by changing the physical antenna setup at the base station?",
+    "answers": {
+      "a": "Frequency reuse and Path loss exponent",
+      "b": "Shadowing effect and Cell radius",
+      "c": "B.S. height and Vertical beam tilt",
+      "d": "Tx power of B.S. and Frequency reuse"
+    },
+    "correctAnswer": "c",
+    "difficulty": "medium"
+  }
+
   ]
 }

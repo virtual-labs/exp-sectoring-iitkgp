@@ -1,39 +1,116 @@
-{
-  "version": 2.0,
+  {
+	  "version": 2.0,
   "questions": [
-    {
-      "question": "This is a Sample Question 1?",
-      "answers": {
-        "a": "answer1",
-        "b": "answer2",
-        "c": "answer3",
-        "d": "answer4"
-      },
-      "explanations": {
-        "a": "Explanation 1  <a href='www.google.com'>here</a>",
-        "b": "Explanation 2",
-        "c": "Explanation 2",
-        "d": "Explanation 2"
-      },
-      "correctAnswer": "a",
-      "difficulty": "beginner"
+   {
+    "question": "1. What is the primary aim of the experiment described in the text?",
+    "answers": {
+      "a": "To measure the maximum transmit power of a base station.",
+      "b": "To understand how various factors affect the downlink Carrier-to-Interference ratio.",
+      "c": "To calculate the exact path loss exponent for a city.",
+      "d": "To design a new type of cellular antenna."
     },
-    {
-      "question": "This is a Sample Question 2?",
-      "answers": {
-        "a": "answer1",
-        "b": "answer2",
-        "c": "answer3",
-        "d": "answer4"
-      },
-      "explanations": {
-        "a": "Explanation 1  <a href='www.google.com'>here</a>",
-        "b": "Explanation 2",
-        "c": "Explanation 2",
-        "d": "Explanation 2"
-      },
-      "correctAnswer": "c",
-      "difficulty": "beginner"
-    }
+    "correctAnswer": "b",
+    "difficulty": "beginner"
+  },
+  {
+    "question": "2. What does 'Tx power of B.S.' refer to?",
+    "answers": {
+      "a": "The processing speed of the base station.",
+      "b": "The amount of signal strength the base station transmits.",
+      "c": "The power consumed by the base station's cooling system.",
+      "d": "The total number of users connected to the base station."
+    },
+    "correctAnswer": "b",
+    "difficulty": "beginner"
+  },
+  {
+    "question": "3. Which objective relates to the concept of using the same frequencies in different, separated cells?",
+    "answers": {
+      "a": "Sectoring",
+      "b": "Shadowing effect",
+      "c": "Frequency reuse",
+      "d": "Vertical beam tilt"
+    },
+    "correctAnswer": "c",
+    "difficulty": "beginner"
+  },
+  {
+    "question": "4. What is 'sectoring' used for in a base station?",
+    "answers": {
+      "a": "To divide a cell into multiple directional segments to reduce interference.",
+      "b": "To connect the cell to different parts of the core network.",
+      "c": "To increase the physical height of the base station tower.",
+      "d": "To assign different frequencies to every single user."
+    },
+    "correctAnswer": "a",
+    "difficulty": "medium"
+  },
+  {
+    "question": "5. What does the 'shadowing effect' describe?",
+    "answers": {
+      "a": "The change in signal strength due to the time of day.",
+      "b": "The signal blockage caused by large obstructions like buildings or hills.",
+      "c": "The interference from adjacent frequency channels.",
+      "d": "The pattern of radio waves cast by the antenna itself."
+    },
+    "correctAnswer": "b",
+    "difficulty": "medium"
+  },
+  {
+    "question": "6. How might changing the 'B.S. height' impact the cell?",
+    "answers": {
+      "a": "It only changes the power consumption of the base station.",
+      "b": "It only affects the path loss exponent.",
+      "c": "It can alter the cell's coverage area and its interference with other cells.",
+      "d": "It has no significant effect on signal propagation."
+    },
+    "correctAnswer": "c",
+    "difficulty": "medium"
+  },
+  {
+    "question": "7. What does the 'path loss exponent' parameter represent?",
+    "answers": {
+      "a": "The rate at which signal strength decreases with distance.",
+      "b": "The total number of paths a signal can take.",
+      "c": "The power level of the transmitted signal.",
+      "d": "The physical angle of the antenna."
+    },
+    "correctAnswer": "a",
+    "difficulty": "advanced"
+  },
+  {
+    "question": "8. What is the purpose of adjusting the 'vertical beam tilt' of an antenna?",
+    "answers": {
+      "a": "To aim the signal more towards the ground or the horizon.",
+      "b": "To change the frequency of the signal.",
+      "c": "To physically rotate the antenna horizontally.",
+      "d": "To switch the antenna between transmit and receive modes."
+    },
+    "correctAnswer": "a",
+    "difficulty": "advanced"
+  },
+  {
+    "question": "9. The experiment aims to study the 'downlink' C/I ratio. What does 'downlink' refer to?",
+    "answers": {
+      "a": "The communication from the mobile phone to the base station.",
+      "b": "The communication from the base station to the mobile phone.",
+      "c": "The connection between two different base stations.",
+      "d": "The signal that has been lost due to shadowing."
+    },
+    "correctAnswer": "b",
+    "difficulty": "medium"
+  },
+  {
+    "question": "10. According to the text, how might a teacher guide this experiment?",
+    "answers": {
+      "a": "By asking students to build their own base station.",
+      "b": "By having students write a new path loss formula.",
+      "c": "By limiting the variables to test, such as focusing only on Tx power.",
+      "d": "By removing all parameters except frequency reuse."
+    },
+    "correctAnswer": "c",
+    "difficulty": "beginner"
+  }
+
   ]
 }
