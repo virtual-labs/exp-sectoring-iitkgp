@@ -3,113 +3,113 @@
 	  "version": 2.0,
   "questions": [
     {
-    "question": "1. If the distance from the transmitter is doubled, and the pathloss exponent is two (like in free space), by how much does the received signal power decrease?",
+    "question": "1. What is the 'cell radius' parameter related to?",
     "answers": {
-      "a": "It decreases by half.",
-      "b": "It decreases by a factor of four.",
-      "c": "It doubles.",
-      "d": "It does not change."
-    },
-    "correctAnswer": "b",
-    "difficulty": "medium"
-  },
-  {
-    "question": "2. When comparing two signals, one at a very high carrier frequency and one at a very low carrier frequency, which one will experience more pathloss over the same distance in free space?",
-    "answers": {
-      "a": "The low-frequency signal.",
-      "b": "The high-frequency signal.",
-      "c": "Both will experience the same pathloss.",
-      "d": "It depends on the transmitter power."
-    },
-    "correctAnswer": "b",
-    "difficulty": "medium"
-  },
-  {
-    "question": "3. What is the main purpose of raising the transmitter antenna height on a cellular tower?",
-    "answers": {
-      "a": "To decrease the carrier frequency.",
-      "b": "To reduce interference from other towers.",
-      "c": "To increase the signal's range by clearing obstacles.",
-      "d": "To reduce the transmitter power required."
+      "a": "The physical size of the base station's antenna.",
+      "b": "The data speed available within the cell.",
+      "c": "The geographic coverage area of a single cell.",
+      "d": "The number of frequencies used in the cell."
     },
     "correctAnswer": "c",
     "difficulty": "beginner"
   },
   {
-    "question": "4. If you are in a building and your cell phone's received signal strength is weak, what is the most likely reason related to pathloss?",
+    "question": "2. A high 'path loss exponent' value implies that the signal strength...",
     "answers": {
-      "a": "The transmitter power of the base station is too low.",
-      "b": "The carrier frequency is too low.",
-      "c": "The pathloss exponent is very high due to walls and obstructions.",
-      "d": "The transmitter antenna is too high."
-    },
-    "correctAnswer": "c",
-    "difficulty": "medium"
-  },
-  {
-    "question": "5. Which of these factors does *not* directly influence the pathloss calculation, but rather the *final* received signal strength?",
-    "answers": {
-      "a": "Carrier frequency.",
-      "b": "Transmitter antenna height.",
-      "c": "Distance of separation.",
-      "d": "Transmitter power."
+      "a": "increases rapidly as you move away from the base station.",
+      "b": "is not affected by distance.",
+      "c": "remains constant throughout the cell.",
+      "d": "decreases rapidly as you move away from the base station."
     },
     "correctAnswer": "d",
     "difficulty": "medium"
   },
   {
-    "question": "6. A pathloss exponent of 4 is measured in a certain environment. What does this high value suggest?",
+    "question": "3. Which of these parameters directly relates to signal blockage from physical objects like buildings?",
     "answers": {
-      "a": "A clear, unobstructed line-of-sight path.",
-      "b": "A signal that is being guided, like in a tunnel.",
-      "c": "A very lossy environment with many reflections and obstructions.",
-      "d": "An environment where signal strength increases with distance."
-    },
-    "correctAnswer": "c",
-    "difficulty": "beginner"
-  },
-  {
-    "question": "7. How does increasing the receiver antenna height, for example, by moving your phone from your pocket to your ear, typically affect the received signal?",
-    "answers": {
-      "a": "It has no effect.",
-      "b": "It significantly increases the pathloss.",
-      "c": "It can slightly improve the signal by reducing local obstructions.",
-      "d": "It changes the carrier frequency."
-    },
-    "correctAnswer": "c",
-    "difficulty": "beginner"
-  },
-  {
-    "question": "8. To calculate the received signal strength, you need the transmitter power and the pathloss. How are they combined?",
-    "answers": {
-      "a": "Transmitter power is added to the pathloss.",
-      "b": "Pathloss is subtracted from the transmitter power.",
-      "c": "Transmitter power is multiplied by the pathloss.",
-      "d": "Transmitter power is divided by the pathloss."
+      "a": "Path loss exponent",
+      "b": "Shadowing effect",
+      "c": "Sectoring",
+      "d": "Vertical beam tilt"
     },
     "correctAnswer": "b",
     "difficulty": "medium"
   },
   {
-    "question": "9. A pathloss prediction formula is used primarily to...",
+    "question": "4. Adjusting the 'vertical beam tilt' would be done to...",
     "answers": {
-      "a": "Choose the brand of the transmitter.",
-      "b": "Estimate the coverage area and plan a wireless network.",
-      "c": "Calculate the data speed of the connection.",
-      "d": "Determine the physical size of the receiver antenna."
+      "a": "change the cell's frequency.",
+      "b": "control the up-and-down angle of the signal to focus coverage.",
+      "c": "make the base station tower taller or shorter.",
+      "d": "increase the total transmit power."
+    },
+    "correctAnswer": "b",
+    "difficulty": "advanced"
+  },
+  {
+    "question": "5. What is the C/I ratio a measure of?",
+    "answers": {
+      "a": "The desired signal strength compared to the interference strength.",
+      "b": "The total number of carriers versus the total interference.",
+      "c": "The cell's capacity versus its interference.",
+      "d": "The cost of the base station versus its performance."
+    },
+    "correctAnswer": "a",
+    "difficulty": "medium"
+  },
+  {
+    "question": "6. How would increasing the 'Tx power of B.S.' likely affect its *own* cell's coverage and the interference it causes to *other* cells?",
+    "answers": {
+      "a": "It would decrease its coverage and decrease its interference.",
+      "b": "It would increase its coverage and increase its interference.",
+      "c": "It would increase its coverage but decrease its interference.",
+      "d": "It would decrease its coverage but increase its interference."
+    },
+    "correctAnswer": "b",
+    "difficulty": "advanced"
+  },
+  {
+    "question": "7. The experiment mentions a 'ten percentile SNR'. What does this likely refer to?",
+    "answers": {
+      "a": "The signal quality experienced by the best ten users in the cell.",
+      "b": "The signal quality that is better than ten percent of all measurements.",
+      "c": "The average signal quality of the first ten measurements.",
+      "d": "The signal quality that is only ten percent of the maximum possible."
+    },
+    "correctAnswer": "b",
+    "difficulty": "advanced"
+  },
+  {
+    "question": "8. Which of the listed objectives involves using directional antennas at the base station?",
+    "answers": {
+      "a": "Shadowing effect",
+      "b": "Path loss exponent",
+      "c": "Frequency reuse",
+      "d": "Sectoring"
+    },
+    "correctAnswer": "d",
+    "difficulty": "medium"
+  },
+  {
+    "question": "9. A teacher fixing all parameters except one, like 'transmit power', is an example of...",
+    "answers": {
+      "a": "a poorly designed experiment.",
+      "b": "a controlled experiment to isolate a single variable.",
+      "c": "an experiment to measure the shadowing effect.",
+      "d": "an experiment to test frequency reuse."
     },
     "correctAnswer": "b",
     "difficulty": "beginner"
   },
   {
-    "question": "10. In a real-world city environment, the measured pathloss is almost always...?",
+    "question": "10. Which two parameters are most directly adjusted by changing the physical antenna setup at the base station?",
     "answers": {
-      "a": "Greater than the pathloss predicted by the free-space model.",
-      "b": "Less than the pathloss predicted by the free-space model.",
-      "c": "Exactly equal to the pathloss predicted by the free-space model.",
-      "d": "Zero."
+      "a": "Frequency reuse and Path loss exponent",
+      "b": "Shadowing effect and Cell radius",
+      "c": "B.S. height and Vertical beam tilt",
+      "d": "Tx power of B.S. and Frequency reuse"
     },
-    "correctAnswer": "a",
+    "correctAnswer": "c",
     "difficulty": "medium"
   }
 
