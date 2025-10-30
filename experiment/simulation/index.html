@@ -1,727 +1,959 @@
 <!DOCTYPE html>
-<html lang="en"><!--html tag start-->
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
-    <title>PMOS Capacitor Band Diagram</title>
-    
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css">
-    
-    <!-- Font Awesome and jQuery UI CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui/1.12.1/themes/base/jquery-ui.css">   
-    <link rel="stylesheet" href="adik.css"> 
-    
-    <!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    
-    <!-- Bootstrap Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- MathJax for mathematical typesetting -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
-    
-    <!-- Additional Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.2.1/math.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Knob/1.2.13/jquery.knob.min.js"></script>
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-   
-    <script src="./js/jquery.flot.min.js"></script>
-
-
-
-
+    <title>Sectoring Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f9;
-        color: #333;
-        margin: 0;
-        padding: 20px;
-      }
-      .form-container {
-        max-width: 1100px;
-        margin: 0 auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      
-      td {
-        padding: 10px;
-        text-align: right;
-      }
-      td:nth-child(2n) {
-        text-align: left;
-        padding-left: 5px;
-      }
-      input[type="text"] {
-        width: 100px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-      input[type="button"] {
-        padding: 8px 12px;
-        margin: 5px;
-        border: none;
-        border-radius: 4px;
-        background-color: #007bff;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-      input[type="button"]:hover {
-        background-color: #0056b3;
-      }
-      .button-group {
-        text-align: center;
-        margin-top: 20px;
-      }
-      .button-group input[type="button"] {
-        margin: 5px;
-      }
-      .material-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 20px;
-      }
-      .material-buttons input[type="button"] {
-        background-color: #28a745;
-      }
-      .material-buttons input[type="button"]:hover {
-        background-color: #218838;
-      }
-      .voltage-control {
-        text-align: center;
-        margin-top: 20px;
-      }
-      .voltage-control input[type="button"] {
-        background-color: #dc3545;
-      }
-      .voltage-control input[type="button"]:hover {
-        background-color: #c82333;
-      }
-
-
-      .table-container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    td {
-      padding: 10px;
-      text-align: left;
-    }
-    td p {
-      margin: 0;
-      display: flex;
-      align-items: center;
-    }
-    td span {
-      margin-left: 5px;
-    }
-    .math {
-      font-family: "Times New Roman", serif;
-      font-style: italic;
-    }
-    .flex-container {
-      display: flex;
-      align-items: center;
-    }
-    .center-text {
-      text-align: center;
-      font-weight: bold;
-      margin: 20px 0;
-    }
-    .value {
-      font-weight: bold;
-      color: #007bff;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #simulationCanvas {
+            cursor: grab;
+        }
+        .control-panel label {
+            font-weight: 500;
+        }
+        .control-panel input, .control-panel select {
+            width: 100%;
+            padding: 4px 8px;
+            border-radius: 0.375rem;
+            border: 1px solid #D1D5DB;
+        }
+        /* Style for disabled inputs */
+        .control-panel input:disabled, .control-panel select:disabled {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+        }
+        .control-panel .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .control-panel .input-group input {
+            flex-grow: 1;
+        }
+        .control-panel .input-group .unit {
+            white-space: nowrap;
+        }
+        .output-display {
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            border-radius: 0.375rem;
+            height: 120px;
+        }
+        .reading-window {
+            height: 150px;
+            background-color: #fefce8; /* Light yellow */
+            border: 1px solid #eab308; /* Amber */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 500;
+        }
     </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
 
-  </head>
-<body><!--body tag start-->
-    
-    
-   
-	
-    <div class="container p-3 my-5 text-left border"><!--3rd Container under body tag start-->
-      <div class="row"><!--First row under 3rd container start-->
-        <div class="col-md-1"></div><!--First col under 3rd container start& end-->
-        <div class="col-md-10"><!--2nd col under 3rd container start-->
-            <p class="text-center bg-success"> <a class="nav-link" data-bs-toggle="tab"  id="instcontrol" style="background-color:#128BD9"  ><span class=" h3 text-dark"> Instructions </span></a>
-              <div id="inst" style="display:block;height:200px;overflow-y:auto;text-align:justify">
-					
-					<!-- INSRTUCTION START -->
-          <ol>
-    
-            <h4>Input Parameters</h4>
-            <ul>
-              <li><strong>ϕm, ϕs (Work Function of the Metal and Semiconductor):</strong> Enter the values in electron volts (eV).</li>
-              <li><strong>χ (Electron Affinity):</strong> Enter the electron affinity in eV.</li>
-              <li><strong>tox, tox2 (Oxide Thickness):</strong> Enter the oxide thickness in nanometers (nm).</li>
-              <li><strong>εox, εox2 (Dielectric Constants of the Oxides):</strong> Enter the dielectric constants.</li>
-              <li><strong>Eg (Bandgap Energy):</strong> Enter the bandgap energy using the provided formula if needed.</li>
-              <li><strong>Nd (Donor Concentration)</strong> and <strong>Na (Acceptor Concentration):</strong> Enter the concentration values in cm³.</li>
-              <li><strong>T (Temperature):</strong> Enter the operating temperature in Kelvin (K).</li>
-              <li><strong>εsemi (Semiconductor Dielectric Constant):</strong> Enter the value.</li>
-              <li><strong>V (Voltage):</strong> Input the voltage applied across the device.</li>
-              <li><strong>Material Selection (Si, Ge, GaAs):</strong> Choose the material of the semiconductor.</li>
-            </ul>
-  
-            <h4>Submit</h4>
-            <p>Once all parameters are entered, click the <strong>Submit</strong> button to run the simulation.</p>
-  
-            <h4>View Results</h4>
-            <ul>
-              <li><strong>Band Diagram:</strong> Observe the energy levels within the semiconductor, including the conduction band edge, valence band edge, and Fermi level.</li>
-              
-            </ul>
-  
-            <h4>Explore Different Regions</h4>
-            <p>Use the <strong>Accumulation</strong>, <strong>Flatband</strong>, <strong>Depletion</strong>, <strong>Threshold</strong>, and <strong>Inversion</strong> buttons to explore different operational regions of the PMOS transistor.</p>
-  
-            <h4>Additional Notes</h4>
-            <ul>
-              <li>The right side of the screen displays calculated parameters such as the built-in potential (ϕs), maximum depletion width (xP), surface potential (ψs), and threshold voltage (VT).</li>
-              <li>The calculated charge (Q) and electric field (Eox) in the oxide layer are also shown.</li>
-              <li>Make sure to adjust and explore the parameters to see how they affect the band diagram, charge density, and electric field.</li>
-            </ul>
-     
-    </ol>
-				<!-- INSTRUCTION STOP -->	
-					
-		   </div>
-            </p> 
-          </div><!--2nd col under 3rd container end-->
-		  
-        <div class="col-md-1"></div><!--3rd col under 3rd container start& end-->
-      </div><!--First row under 3rd container end-->
-    </div><!--3rd Container under body tag end-->
-	
-   <!--simulation start -->
-   <div>
-    <body style="background-color:white" onload="moscap();"><div id="MathJax_Message" style="display: none;"></div>
+    <div class="container mx-auto p-4">
+        <header class="text-center mb-4">
+            
+        </header>
 
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            
+            <div class="lg:col-span-2 bg-white p-2 rounded-lg shadow-md aspect-square">
+                <canvas id="simulationCanvas"></canvas>
+            </div>
 
-<style>
-h3 {margin-left:1cm}
-</style>
+            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col gap-4">
+                <div class="control-panel grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <div class="col-span-2">
+                        <button id="resetBtn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">Reset</button>
+                    </div>
+                    
+                    <div class="col-span-2">
+                        <label for="environment">PL Model</label>
+                        <select id="environment">
+                            <option value="rune" selected>Rune</option>
+                            <option value="urban_micro">Urban Micro</option>
+                            <option value="urban_macro">Urban Macro</option>
+                            <option value="suburban_macro">Suburban Macro</option>
+                            <option value="rural_macro">Rural Macro</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="reuse">Reuse (N)</label>
+                        <select id="reuse">
+                            </select>
+                    </div>
 
-<script type="text/x-mathjax-config;executed=true">
-  MathJax.Hub.Config({
-    extensions: ["tex2jax.js"],
-    jax: ["input/TeX","output/HTML-CSS"],
-    tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
-  });
-</script>
-
-
-<script language="JavaScript">
-
-var Ev = [];  //valence band energy
-// d arrays used for plotting
-var d1 = [];  //Ev
-var d2 = [];  //EF
-var d3 = [];  //Ec
-var d4 = [];  //n
-var d5 = [];  //p
-var d6 = [];  //rho
-var d7 = [];  //Electric field
-
-echarge = 1.60217733E-19;
-kb = 1.380658E-23/echarge;  //eV/K
-
-function moscap() { 
- tox = eval(data.tox.value)*1E-9;
- na = 1E6*eval(data.na.value);
- Va = eval(data.V.value); //applied voltage
- if (Math.abs(Va)<1E-10) {V = 0; data.V.value=0;}
- Nv = 1E6*eval(data.Nv.value);
- Nc = 1E6*eval(data.Nc.value);
- T = eval(data.T.value);
- Eg = eval(data.Eg.value);
- phi_m = eval(data.phi_m.value);
- chi_s = eval(data.chi_s.value);
- document.getElementById('Eg_txt').innerHTML=Eg.toPrecision(3);
- eps = 8.854187817E-12*eval(data.eps.value);
- eps_ox = 8.854187817E-12*eval(data.eps_ox.value);
- ni=Math.sqrt(Nc*Nv*Math.pow(T/300,3))*Math.exp(1.6022E-19*(-Eg)/(2*1.380658E-23*T));
- document.getElementById('ni_txt').innerHTML=(ni/1E6).toPrecision(3);
- Ev0 = kb*T*Math.log(na/Nv); //Ev - EF  far from the oxide
- Ec0 = kb*T*Math.log(ni*ni/(Nc*na)); //EF - Ec far from the oxide
- phi_s = chi_s + Eg + Ev0; // work function of semiconductor 
- document.getElementById('phi_s_txt').innerHTML=(phi_s).toPrecision(3);
- Vfb = phi_m  - phi_s; // flat band voltage
- document.getElementById('Vfb_txt').innerHTML=(Vfb).toPrecision(3);
- VT = 2*tox*Math.sqrt(eps*na*1.380658E-23*T*Math.log(na/ni))/eps_ox+2*kb*T*Math.log(na/ni);  //threshold voltage in depletion approximation
- document.getElementById('VT_txt').innerHTML=(VT+Vfb).toPrecision(3);
- xp = 2*Math.sqrt(eps*kb*T*Math.log(na/ni)/(echarge*na)); // maximum depletion width in depletion approximation
- document.getElementById('xp_txt').innerHTML=(1E6*xp).toPrecision(3);
- cox= eps_ox/tox;
- V = Va - phi_m + phi_s; //zero bias should result in a built-in voltage corresponding to the work function difference
- Es0 = -tox*echarge*na/eps_ox + echarge*na*Math.sqrt(tox*tox/(eps_ox*eps_ox) + 2*(Va - Vfb)/(echarge*na*eps)); //Es from the depletion approximation
- document.getElementById('Es0_txt').innerHTML=Es0.toPrecision(3);
- VIB0 = eps*Es0*Es0/(2*echarge*na);  //V_IB from the depletion approximation
- document.getElementById('VIB0_txt').innerHTML=VIB0.toPrecision(3);
-
-
-/* This section starts with somewhat arbitray initial conditions for Ev(x) and its derivative
-   dEv(x)/dx inside the bulk of the semiconductor and then integrates the Possion equation
-   to the left to calculate the voltage at the semiconductor/oxide interface and then the 
-   voltage at the gate. The calculated voltage at the gate is compared to the desired voltage at the gate 
-   the initial conditions are adjusted to get the calculated value closer to the desired value.
-*/
-  xr = 3.6*xp;   //right position for binary search
-  xm = 1.8*xp; //middle position for binary search
-  xl = 0;      //left position for binary search
-  for (j=0; j<16; j++) {
-    Ev = Ev0;
-    dEvdx = 0;
-    if (V>0) {dEvdx = 1e3; } 
-    if (V<0) {dEvdx = -1e3; } 
-    dx = xm/300;
-    for (i=0; i<301; i++) { //numerical integration using the midpoint method
-      x = xm*(1-i/300);
-      Ev_mid = Ev - dEvdx*dx/2;  //Ev at the midpoint
-      rho_mid = -na - Nc*Math.exp(-(Eg+Ev_mid)/(kb*T)) + Nv*Math.exp(Ev_mid/(kb*T));
-      dEvdx_mid = dEvdx - echarge*rho_mid*0.5*dx/eps;
-      Ev = Ev - dEvdx_mid*dx;
-      dEvdx = dEvdx - echarge*rho_mid*dx/eps;
-    }
-    Vs = Ev0 - Ev;
-    Es = dEvdx;
-    Eox = Es*eps/eps_ox;
-    Vtmp = Vs + Eox*tox;
-
-//binary search
-    if (V<0) {  
-      if (Vtmp > V) {xl = xm; xm = (xr + xl)/2; }
-      if (Vtmp < V) {xr = xm; xm = (xr + xl)/2; } 
-    }
-    else {
-      if (Vtmp < V) {xl = xm; xm = (xr + xl)/2; }
-      if (Vtmp > V) {xr = xm; xm = (xr + xl)/2; } 
-    }
-
-  } // end j
-
-/* This section solves the Possion equation one more time using the optimized initial conditions
-   and saves the data in arrays so it can be plotted.
-*/
-    Ev = Ev0;
-    dEvdx = 0;
-    if (V>0) {dEvdx = 1e3; } 
-    if (V<0) {dEvdx = -1e3; } 
-    dx = xm/300;
-    for (i=0; i<301; i++) { //numerical integration using the midpoint method
-      x = xm*(1-i/300);
-      Ev_mid = Ev - dEvdx*dx/2;  //Ev at the midpoint
-      rho_mid = -na - Nc*Math.exp(-(Eg+Ev_mid)/(kb*T)) + Nv*Math.exp(Ev_mid/(kb*T));
-      dEvdx_mid = dEvdx - echarge*rho_mid*0.5*dx/eps;
-      Ev = Ev - dEvdx_mid*dx;
-      dEvdx = dEvdx - echarge*rho_mid*dx/eps;
-
-      d1[i] = [1E6*x,Ev];
-      d3[i] = [1E6*x,Ev+Eg];
-      n = Nc*Math.exp(-(Eg+Ev)/(kb*T))/1E21;
-      p = Nv*Math.exp(Ev/(kb*T))/1E21
-      d4[i] = [1E6*x,n];
-      d5[i] = [1E6*x,p];
-      d6[i] = [1E6*x,p-n-na/1E21];
-      d7[i] = [1E6*x,dEvdx*1E-6];
-    }
-    d4[301] = [0,0]; d4[302] = [-1E6*(0.25*xp+tox),0];
-    d5[301] = [0,0]; d5[302] = [-1E6*(0.25*xp+tox),0];
-    d6[301] = [0,0]; d6[302] = [-1E6*tox,0]; d6[303] = [-1E6*tox,-d6[300][1]];  d6[304] = [-1E6*(tox-xm/100),-0.92*d6[300][1]]; 
-    d6[305] = [-1E6*(tox+xm/100),-0.92*d6[300][1]]; d6[306] = [-1E6*tox,-d6[300][1]]; d6[307] = [-1E6*tox,0]; d6[308] = [-1E6*(0.25*xp+tox),0];
-    d2[0] = [1E6*xm,0];
-    d2[1] = [0,0];
-    VIB = Ev0 - Ev;
-    Es = dEvdx;
-    Eox = Es*eps/eps_ox;
-    Q = -Es*eps; //the charge on the semiconductor
-    d7[301] = [0,Eox*1E-6]; d7[302]=[-tox*1E6,Eox*1E-6];  d7[303] = [-tox*1E6,0]; d7[304] = [-1E6*(0.25*xp+tox),0];
-    Vtmp = VIB + Eox*tox;
-    d2[3] = null;
-    d2[4] = [-1E6*tox,-Va];
-    d2[5] = [-1E6*(0.25*xp+tox),-Va];
-    d3[301] = [0,d3[300][1]+1];
-    d3[302] = [-1E6*tox,d3[300][1]+1- Eox*tox];
-    d3[303] = [-1E6*tox,-Vtmp];
-    d1[301] = [0,d1[300][1]-1];
-    d1[302] = [-1E6*tox,d1[300][1]-1- Eox*tox];
-    d1[303] = [-1E6*tox,-Vtmp];
-    if (V==0) { //
-      d1[0] = [1E6*xp,Ev0]; d2[0] = [1E6*xp,0]; d3[0] = [1E6*xp,Ev0+Eg];
-      d4[0] = [1E6*xp,0]; d5[0] = [1E6*xp,na/1E21]; d6[0] = [1E6*xp,0]; 
-      d7.length = 0;
-      d7[0] = [1E6*xp,0]; d7[1] = [-1E6*(0.25*xp+tox),0];
-    }
-
-  document.getElementById('Vs_txt').innerHTML=(VIB).toPrecision(3);
-  document.getElementById('Vtmp_txt').innerHTML=(Vtmp + phi_m - phi_s).toPrecision(3);
-  document.getElementById('Q_txt').innerHTML=(Q).toPrecision(3);
-  document.getElementById('n0_txt').innerHTML=(d4[300][1]).toPrecision(3);
-  document.getElementById('Eox_txt').innerHTML=(Eox).toPrecision(3); 
-  document.getElementById('Es_txt').innerHTML=(Es).toPrecision(3); 
-
-//plot bands
-     // Define data for the plot
-     var data1 = [ 
-    { data: d3, color: "rgb(255,0,0)", shadowSize: 0, lines: { show: true, lineWidth: 2 }, points: { show: true, radius: 3, fill: true, fillColor: "rgb(255,0,0)" }, label: "E<sub>c</sub>" },
-    { data: d1, color: "rgb(0,255,255)", shadowSize: 0, lines: { show: true, lineWidth: 2 }, points: { show: true, radius: 3, fill: true, fillColor: "rgb(0,255,255)" }, label: "E<sub>v</sub>" },
-    { data: d2, color: "rgb(255,165,0)", shadowSize: 0, lines: { show: true, lineWidth: 2 }, points: { show: true, radius: 3, fill: true, fillColor: "rgb(255,165,0)" }, label: "E<sub>F</sub>" }
-];
-
-// Plot the graph
-var plot = $.plot($("#placeholder1"), data1, {
-    grid: { hoverable: true, clickable: true },
-    xaxis: { axisLabel: "Voltage (V)" },
-    yaxis: { axisLabel: "Energy Levels" }
-});
-
-$("#placeholder1").bind("plothover", function (event, pos, item) {
-    if (item) {
-        $("#tooltip").html(item.series.label + "<br>V: " + item.datapoint[0].toFixed(2) + " V<br>E: " + item.datapoint[1].toFixed(2))
-            .css({ top: item.pageY + 5, left: item.pageX + 5 })
-            .fadeIn(200);
-    } else {
-        $("#tooltip").hide();
-    }
-});
-
-$(document).ready(function () {
-    $("body").append("<div id='tooltip' style='position: absolute; display: none; border: 1px solid #ccc; background: #fff; padding: 5px; font-size: 12px;'></div>");
-});
-
-
-
-
-
-
-MathJax.Hub.Queue(['Typeset',MathJax.Hub]);  //have Mathjax process the plot legends that were redrawn
-}
-
-</script>
-
-
-<style>
-p {margin-left:1cm; margin-right:1cm;}
-p.t {margin-left:0cm; margin-right:0cm;}
-h2 {margin-left:1cm;}
-</style>
-
-  
-  
-
-
-<div class="form-container">
-  <form name="data">
-    <table>
-      <tr>
-        <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>ϕ</mi><mi>m</mi></msub></math> =</td>
-        <td><input type="text" name="phi_m" size="10" value="4.08" spellcheck="false"></td>
-        <td>eV</td>
-        <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>χ</mi><mi>s</mi></msub></math> =</td>
-        <td><input type="text" name="chi_s" size="10" value="4.05" spellcheck="false"></td>
-        <td>eV</td>
-      </tr>
-      <tr>
-        <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>t</mi><mrow><mi>o</mi><mi>x</mi></mrow></msub></math> =</td>
-        <td><input type="text" name="tox" size="10" value="3" spellcheck="false"></td>
-        <td>nm</td>
-        <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>ϵ</mi><mrow><mi>o</mi><mi>x</mi></mrow></msub></math> =</td>
-        <td><input type="text" name="eps_ox" size="10" value="4" spellcheck="false"></td>
-        <td></td>
-        <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>N</mi><mi>c</mi></msub><mo>(</mo><mn>300</mn><mo>)</mo></math> =</td>
-        <td><input type="text" name="Nc" size="10" value="2.78E19" spellcheck="false"></td>
-        <td>1/cm³</td>
-        <td><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>T</mi></math> =</td>
-        <td><input type="text" name="T" size="10" value="300" spellcheck="false"></td>
-        <td>K</td>
-      </tr>
-      <tr>
-        <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>E</mi><mi>g</mi></msub></math> =</td>
-        <td><input type="text" name="Eg" size="25" value="1.166-4.73E-4*T*T/(T+636)" spellcheck="false"></td>
-        <td>eV</td>
-        <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>ϵ</mi><mrow><mi>s</mi><mi>e</mi><mi>m</mi><mi>i</mi></mrow></msub></math> =</td>
-        <td><input type="text" name="eps" size="10" value="12" spellcheck="false"></td>
-        <td></td>
-        <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>N</mi><mi>v</mi></msub><mo>(</mo><mn>300</mn><mo>)</mo></math> =</td>
-        <td><input type="text" name="Nv" size="10" value="9.84E18" spellcheck="false"></td>
-        <td>1/cm³</td>
-        <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>N</mi><mi>A</mi></msub></math> =</td>
-        <td><input type="text" name="na" size="10" value="1E17" spellcheck="false"></td>
-        <td>1/cm³</td>
-      </tr>
-    </table>
-
-    <div class="button-group">
-      <div class="voltage-control">
-        <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>V</mi></math> = 
-        <input type="text" name="V" size="10" value="0" spellcheck="false"> V 
-        <input type="button" value="-" onclick="data.V.value = (parseFloat(data.V.value) - 0.01).toFixed(2); moscap();">
-        <input type="button" value="+" onclick="data.V.value = (parseFloat(data.V.value) + 0.01).toFixed(2); moscap();">
-      </div>
-      <input type="button" value="Submit" onclick="moscap();">
-    </div>
-
-    <div class="material-buttons">
-      <input type="button" value=" Si " onclick="setMaterial('Si');">
-      <input type="button" value=" Ge " onclick="setMaterial('Ge');">
-      <input type="button" value="GaAs" onclick="setMaterial('GaAs');">
-    </div>
-
-    <div class="button-group">
-      <input type="button" value="Accumulation" onclick="setVoltage(Vfb - 0.2);">
-      <input type="button" value="Flatband" onclick="setVoltage(Vfb);">
-      <input type="button" value="Depletion" onclick="setVoltage(0.5 * (VT + 2 * Vfb));">
-      <input type="button" value="Threshold" onclick="setVoltage(VT + Vfb);">
-      <input type="button" value="Inversion" onclick="setVoltage(VT + Vfb + 0.2);">
-    </div>
-  </form>
-</div>
-
-<script>
-  function setMaterial(material) {
-    const materials = {
-      Si: {
-        Nc: '2.78E19',
-        Nv: '9.84E18',
-        chi_s: '4.05',
-        Eg: '1.166 - (4.73E-4 * T * T) / (T + 636)'
-      },
-      Ge: {
-        Nc: '1.04E19',
-        Nv: '6.0E18',
-        chi_s: '4.0',
-        Eg: '0.7437 - (4.77E-4 * T * T) / (T + 235)'
-      },
-      GaAs: {
-        Nc: '4.45E17',
-        Nv: '7.72E18',
-        chi_s: '4.07',
-        Eg: '1.519 - (5.41E-4 * T * T) / (T + 204)'
-      }
-    };
-
-    const { Nc, Nv, chi_s, Eg } = materials[material];
-    data.Nc.value = Nc;
-    data.Nv.value = Nv;
-    data.chi_s.value = chi_s;
-    data.Eg.value = Eg;
-    moscap();
-  }
-
-  function setVoltage(value) {
-    data.V.value = value;
-    moscap();
-  }
-</script>
-
-<table align="center"><tbody><tr><td>
-
-<p style="text-align:center"><b>Band diagram</b></p>
-
-<table align="center">
-    <tbody>
-        <tr>
-            <td>
-                <p style="text-align:center;">Energy<br>[eV]</p>
-            </td>
-            <td>
-                <div id="placeholder1" style="width: 400px; height: 300px; position: relative;">
-                    <canvas class="flot-base" width="400" height="300"></canvas>
-                    <canvas class="flot-overlay" width="400" height="300" style="position: absolute; left: 0; top: 0;"></canvas>
-                    <div class="flot-text" style="position: absolute; inset: 0; font-size: smaller; color: #545454;">
-                        <div class="flot-x-axis xAxis" style="position: absolute; inset: 0; display: block;">
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 282px; left: 62px; text-align: center;">0.00</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 282px; left: 138px; text-align: center;">0.05</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 282px; left: 214px; text-align: center;">0.10</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 282px; left: 290px; text-align: center;">0.15</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 282px; left: 366px; text-align: center;">0.20</div>
-                        </div>
-                        <div class="flot-y-axis yAxis" style="position: absolute; inset: 0; display: block;">
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 269px; left: 2px; text-align: right;">-2.5</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 235px; left: 2px; text-align: right;">-2.0</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 202px; left: 2px; text-align: right;">-1.5</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 168px; left: 2px; text-align: right;">-1.0</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 135px; left: 2px; text-align: right;">-0.5</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 101px; left: 6px; text-align: right;">0.0</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 67px; left: 6px; text-align: right;">0.5</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 34px; left: 6px; text-align: right;">1.0</div>
-                            <div class="flot-tick-label tickLabel" style="position: absolute; top: 0; left: 6px; text-align: right;">1.5</div>
+                    <div>
+                        <label for="beamWidth">Beam Width</label>
+                        <div class="input-group">
+                            <input type="number" id="beamWidth" value="120" step="10">
+                            <button class="bg-gray-200 px-2 py-1 rounded-md">Set</button>
                         </div>
                     </div>
-                    <div class="legend" style="position: absolute; top: 13px; right: 19px; background-color: rgba(255, 255, 255, 0.85);">
-                        <table style="font-size: smaller; color: #545454;">
-                            <tbody>
-                                <tr>
-                                    <td class="legendColorBox" style="padding: 1px;">
-                                        <div style="border: 1px solid #ccc;">
-                                            <div style="width: 4px; height: 0; border: 5px solid rgb(255, 0, 0); overflow: hidden;"></div>
-                                        </div>
-                                    </td>
-                                    <td class="legendLabel">E<sub>c</sub></td>
-                                </tr>
-                                <tr>
-                                    <td class="legendColorBox" style="padding: 1px;">
-                                        <div style="border: 1px solid #ccc;">
-                                            <div style="width: 4px; height: 0; border: 5px solid rgb(0, 0, 255); overflow: hidden;"></div>
-                                        </div>
-                                    </td>
-                                    <td class="legendLabel">E<sub>v</sub></td>
-                                </tr>
-                                <tr>
-                                    <td class="legendColorBox" style="padding: 1px;">
-                                        <div style="border: 1px solid #ccc;">
-                                            <div style="width: 4px; height: 0; border: 5px solid rgb(0, 0, 0); overflow: hidden;"></div>
-                                        </div>
-                                    </td>
-                                    <td class="legendLabel">E<sub>F</sub></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="input-group col-span-2">
+                        <label for="rotate" class="whitespace-nowrap">Rotate</label>
+                        <input type="number" id="rotate" value="0" step="1">
+                        <button class="bg-gray-200 px-2 py-1 rounded-md">Set</button>
+                    </div>
+
+                    <div><label for="cellRadius">Cell Radius(m)</label><input type="number" id="cellRadius" value="500" step="50"></div>
+                    <div><label for="txPower">Ptx(dBm)</label><input type="number" id="txPower" value="41" step="1"></div>
+                    <div><label for="fc">fc(GHz)</label><input type="number" id="fc" value="2.0" step="0.1"></div>
+                    <div><label for="ht">HT(m)</label><input type="number" id="ht" value="10" step="1"></div>
+                    <div><label for="hr">HR(m)</label><input type="number" id="hr" value="1.5" step="0.1"></div>
+                    <div><label for="shadowingStdDev">Sigma(dB)</label><input type="number" id="shadowingStdDev" value="8" step="1"></div>
+                    <div><label for="verticalTilt">Vertical tilt(deg)</label><input type="number" id="verticalTilt" value="6" step="1"></div>
+                    <div><label for="pathLossExp">np</label><input type="number" id="pathLossExp" value="2.5" step="0.1"></div>
+
+                    <div class="col-span-2 grid grid-cols-3 gap-2 mt-2">
+                         <div class="flex items-center gap-1"><input type="checkbox" id="sectorized" class="h-4 w-4 rounded" checked><label for="sectorized">Sectorized</label></div>
+                         <div class="flex items-center gap-1"><input type="checkbox" id="shadowing" class="h-4 w-4 rounded" checked><label for="shadowing">Shadowing</label></div>
+                         <div class="flex items-center gap-1"><input type="checkbox" id="grid" class="h-4 w-4 rounded" checked><label for="grid">Grid</label></div>
+                         <div class="flex items-center gap-1 col-span-3"><input type="checkbox" id="autoPlot" class="h-4 w-4 rounded"><label for="autoPlot">Auto Plot</label></div>
                     </div>
                 </div>
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <p style="text-align:center;"><i>x</i> [μm]</p>
-            </td>
-        </tr>
-    </tbody>
-</table>
 
+                <div class="grid grid-cols-2 gap-2">
+                    <div id="sinrDisplay" class="reading-window col-span-1 p-2">
+                        <div>SINR(dB)</div>
+                        <div>--</div>
+                    </div>
+                    <div id="distanceDisplay" class="reading-window col-span-1 p-2">
+                        <div>d(m)</div>
+                        <div>--</div>
+                    </div>
+                </div>
 
-</td><td>
+                <div id="output" class="output-display"></div>
+                 <div class="grid grid-cols-2 gap-4">
+                        <button id="reportBtn" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>Report</button>
+                        <button id="cdfPlotBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">CDF Plot</button>
+                </div>
 
-  <div class="table-container">
-    <table>
-      <tbody>
-        <tr>
-          <td>
-            <p>
-              <span class="math">E<sub>g</sub> =</span>
-              <span id="Eg_txt" class="value">1.12</span>&nbsp;eV
-            </p>
-          </td>
-          <td>
-            <p>
-              <span class="math">n<sub>i</sub> =</span>
-              <span id="ni_txt" class="value">6.40e+9</span>&nbsp;1/cm³
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <p>
-              <span class="math">E<sub>s</sub> =</span>
-              <span id="Es_txt" class="value">1.57e+7</span>&nbsp;V/m
-            </p>
-          </td>
-          <td>
-            <p>
-              <span class="math">V<sub>s</sub> =</span>
-              <span id="Vs_txt" class="value">0.831</span>&nbsp;V
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <p>
-              <span class="math">Q =</span>
-              <span id="Q_txt" class="value">-0.00167</span>&nbsp;C/m²
-            </p>
-          </td>
-          <td>
-            <p>
-              <span class="math">n(x=0) =</span>
-              <span id="n0_txt" class="value">37.2</span>&nbsp;×&nbsp;10<sup>15</sup>&nbsp;1/cm³
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <p>
-              <span class="math">E<sub>ox</sub> =</span>
-              <span id="Eox_txt" class="value">4.70e+7</span>&nbsp;V/m
-            </p>
-          </td>
-          <td>
-            <p>
-              <span class="math">V<sub>shoot</sub> =</span>
-              <span id="Vtmp_txt" class="value">0.0000221</span>&nbsp;V
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div class="flex-container">
-              <span class="math">$$\phi_s =$$</span>
-              <span id="phi_s_txt" class="value">5.05</span> eV
+                <div class="mt-4 border-t pt-4">
+                    <div class="mb-2 text-sm">
+                        <label for="colorGrouping" class="font-medium">Color Points By:</label>
+                        <select id="colorGrouping" class="w-full p-1 border rounded-md">
+                            <option value="sector" selected>Sector</option>
+                            <option value="bsid">BS ID</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <canvas id="sinrVsDistanceChart"></canvas>
+                </div>
             </div>
-          </td>
-          <td>
-            <div class="flex-container">
-              <span class="math">$$V_{fb} = \phi_m - \phi_s =$$</span>
-              <span id="Vfb_txt" class="value">-0.972</span> V
-            </div>
-          </td>
-        </tr>
-        <tr><td colspan="2">&nbsp;</td></tr>
-        <tr><td colspan="2"><p class="center-text">From the depletion approximation:</p></td></tr>
-        <tr>
-          <td>
-            <p>
-              <span class="math">max (x<sub>p</sub>) =</span>
-              <span id="xp_txt" class="value">0.107</span>&nbsp;μm
-            </p>
-          </td>
-          <td>
-            <p>
-              <span class="math">V<sub>T</sub> =</span>
-              <span id="VT_txt" class="value">0.0292</span>&nbsp;V
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <p>
-              <span class="math">E<sub>s</sub> =</span>
-              <span id="Es0_txt" class="value">1.58e+7</span>&nbsp;V/m
-            </p>
-          </td>
-          <td>
-            <p>
-              <span class="math">V<sub>s</sub> =</span>
-              <span id="VIB0_txt" class="value">0.830</span>&nbsp;V
-            </p>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+        </div>
+    </div>
 
-</td></tr></tbody></table>
+    <div id="cdfModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-3xl">
+            <h3 class="text-center text-xl font-bold mb-4">CDF of SINR</h3>
+            <canvas id="cdfChart"></canvas>
+            <div id="cdfChartLegend" class="text-center mt-2 font-semibold border rounded-md p-1 bg-gray-50"></div>
+            <button id="closeCdfModal" class="mt-4 w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">Close</button>
+        </div>
+    </div>
+    
+    <div id="nameModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-sm text-center">
+            <h3 class="text-xl font-bold mb-4">Welcome!</h3>
+            <p class="text-gray-600 mb-4">What is your name?</p>
+            <input type="text" id="userName" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Enter your name">
+            <button id="submitName" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Start Simulation</button>
+        </div>
+    </div>
 
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileImg = new Image();
+            mobileImg.src = 'images/mobiles.png';
+            let mobileImgLoaded = false;
+            mobileImg.onload = () => {
+                mobileImgLoaded = true;
+                if (simState.mobileUser) { 
+                    draw();
+                }
+            };
 
-</div>
-   <!--simulation end -->
-  	 
-</body><!--body tag end-->
-</html><!--html tag end-->
+            const towerImg = new Image();
+            towerImg.src = 'images/tower.png';
+            let towerImgLoaded = false;
+            towerImg.onload = () => {
+                towerImgLoaded = true;
+                draw();
+            };
+
+            const canvas = document.getElementById('simulationCanvas');
+            const ctx = canvas.getContext('2d');
+            const outputDiv = document.getElementById('output');
+            const nameModal = document.getElementById('nameModal');
+            const cdfModal = document.getElementById('cdfModal');
+            
+            const controls = {
+                environment: document.getElementById('environment'),
+                reuse: document.getElementById('reuse'),
+                beamWidth: document.getElementById('beamWidth'),
+                rotate: document.getElementById('rotate'),
+                cellRadius: document.getElementById('cellRadius'),
+                txPower: document.getElementById('txPower'),
+                fc: document.getElementById('fc'),
+                ht: document.getElementById('ht'),
+                hr: document.getElementById('hr'),
+                verticalTilt: document.getElementById('verticalTilt'),
+                pathLossExp: document.getElementById('pathLossExp'),
+                shadowingStdDev: document.getElementById('shadowingStdDev'),
+                sectorized: document.getElementById('sectorized'),
+                shadowing: document.getElementById('shadowing'),
+                grid: document.getElementById('grid'),
+                autoPlot: document.getElementById('autoPlot'),
+                report: document.getElementById('reportBtn'),
+                colorGrouping: document.getElementById('colorGrouping'),
+            };
+
+            const environmentParams = {
+                rune: { np: 2.5, sigma: 8 },
+                urban_micro: { np: 3.5, sigma: 6 },
+                urban_macro: { np: 3.0, sigma: 8 },
+                suburban_macro: { np: 2.5, sigma: 10 },
+                rural_macro: { np: 2.2, sigma: 12 }
+            };
+
+            const sectorColors = {
+                1: 'rgba(255, 99, 132, 0.9)',
+                2: 'rgba(54, 162, 235, 0.9)',
+                3: 'rgba(255, 206, 86, 0.9)',
+                0: 'rgba(150, 150, 150, 0.9)'
+            };
+            let bsColorMap = {};
+
+            const resetBtn = document.getElementById('resetBtn');
+            const cdfPlotBtn = document.getElementById('cdfPlotBtn');
+            const reportBtn = document.getElementById('reportBtn');
+            const closeCdfModalBtn = document.getElementById('closeCdfModal');
+            const submitNameBtn = document.getElementById('submitName');
+            const userNameInput = document.getElementById('userName');
+
+            let simState = {
+                cellRadiusPixels: 100,
+                baseStations: [],
+                mobileUser: null,
+                userName: 'Goutam',
+                sinrHistory: [],
+                isDragging: false,
+            };
+
+            let cdfChart;
+            let sinrVsDistanceChart;
+
+            const dBmToWatts = (dBm) => Math.pow(10, (dBm - 30) / 10);
+            const wattsToDBm = (watts) => 10 * Math.log10(watts) + 30;
+            const dBToLinear = (dB) => Math.pow(10, dB / 10);
+            const linearToDB = (linear) => 10 * Math.log10(linear);
+            
+            const gaussianRandom = () => {
+                let u = 0, v = 0;
+                while(u === 0) u = Math.random();
+                while(v === 0) v = Math.random();
+                return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+            };
+            
+            const getRandomColor = () => {
+                const r = Math.floor(Math.random() * 200);
+                const g = Math.floor(Math.random() * 200);
+                const b = Math.floor(Math.random() * 200);
+                return `rgba(${r}, ${g}, ${b}, 0.9)`;
+            };
+            
+            const getColorForBsId = (id) => {
+                if (!bsColorMap[id]) {
+                    bsColorMap[id] = getRandomColor();
+                }
+                return bsColorMap[id];
+            };
+
+            function populateReuseSelector() {
+                const reuseSelect = controls.reuse;
+                const validN = [1, 3, 4, 7, 9, 12];
+                reuseSelect.innerHTML = ''; 
+
+                for (const nValue of validN) {
+                    const option = document.createElement('option');
+                    option.value = nValue;
+                    option.textContent = nValue;
+
+                    if (nValue === 1) {
+                        option.selected = true;
+                    }
+                    reuseSelect.appendChild(option);
+                }
+            }
+
+            function initCharts() {
+                const cdfCtx = document.getElementById('cdfChart').getContext('2d');
+                cdfChart = new Chart(cdfCtx, {
+                    type: 'line',
+                    data: { labels: [], datasets: [{ 
+                        label: 'CDF of SINR', 
+                        data: [], 
+                        borderColor: 'rgba(0, 0, 0, 1)',
+                        backgroundColor: 'rgba(0, 0, 0, 1)',
+                        borderWidth: 2,
+                        tension: 0.2,
+                        pointStyle: 'rectRot',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }] },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: { title: { display: true, text: 'SINR (dB)' } },
+                            y: { title: { display: true, text: 'CDF' }, min: 0, max: 1.0 }
+                        }
+                    }
+                });
+
+                const svdCtx = document.getElementById('sinrVsDistanceChart').getContext('2d');
+                sinrVsDistanceChart = new Chart(svdCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'SINR(dB) vs Dist(m)',
+                            data: [],
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                            pointRadius: 5,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                             legend: {
+                                display: false,
+                             }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: { display: true, text: 'Distance (m)' }
+                            },
+                            y: {
+                                title: { display: true, text: 'SINR (dB)' }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function getIJForReuse(N) {
+                for (let i = 0; i <= N; i++) {
+                    for (let j = 0; j <= N; j++) {
+                        if (i * i + i * j + j * j === N) return { i, j };
+                    }
+                }
+                return { i: 1, j: 0 }; 
+            }
+
+            function generateBaseStations() {
+                simState.baseStations = [];
+                const R = simState.cellRadiusPixels;
+                const numRings = 6;
+                let cellId = 66; 
+                for (let r = -numRings; r <= numRings; r++) {
+                    for (let q = -numRings; q <= numRings; q++) {
+                         if (Math.abs(q + r) > numRings) continue;
+                        const x = canvas.width / 2 + R * (Math.sqrt(3) * q + Math.sqrt(3) / 2 * r);
+                        const y = canvas.height / 2 + R * (3 / 2 * r);
+                        if (x > -R * 1.5 && x < canvas.width + R * 1.5 && y > -R * 1.5 && y < canvas.height + R * 1.5) {
+                           simState.baseStations.push({ id: cellId++, x, y, q, r, isCoChannel: false });
+                        }
+                    }
+                }
+            }
+
+            function markCoChannelCells() {
+                const N = parseInt(controls.reuse.value);
+                if (N === 1) {
+                    simState.baseStations.forEach(bs => {
+                        if (bs.q !== 0 || bs.r !== 0) {
+                            bs.isCoChannel = true;
+                        }
+                    });
+                    return;
+                }
+                const { i, j } = getIJForReuse(N);
+                simState.baseStations.forEach(bs => bs.isCoChannel = false);
+                const directions = [
+                    { u: i, v: j }, { u: -j, v: i + j }, { u: -i - j, v: i },
+                    { u: -i, v: -j }, { u: j, v: -i - j }, { u: i + j, v: -i }
+                ];
+                directions.forEach(dir => {
+                    const coChannelCell = simState.baseStations.find(bs => bs.q === dir.u && bs.r === dir.v);
+                    if (coChannelCell) coChannelCell.isCoChannel = true;
+                });
+            }
+            
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const R = simState.cellRadiusPixels;
+
+                simState.baseStations.forEach(bs => {
+                    if(controls.grid.checked) {
+                        drawHexagon(bs.x, bs.y, R);
+                    }
+                    if (bs.isCoChannel) {
+                        ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+                        ctx.fill();
+                    }
+                });
+                
+                if(simState.mobileUser && simState.mobileUser.servingBs) {
+                    ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+                    drawHexagon(simState.mobileUser.servingBs.x, simState.mobileUser.servingBs.y, R, true);
+                }
+
+                simState.baseStations.forEach(bs => {
+                    drawTower(bs.x, bs.y);
+                    if (controls.sectorized.checked) {
+                        drawSectors(bs.x, bs.y, R, parseInt(controls.beamWidth.value));
+                    }
+                    ctx.fillStyle = 'black';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(bs.id, bs.x, bs.y + R * 0.6);
+                });
+
+                if (simState.mobileUser) {
+                    if (mobileImgLoaded) {
+                        const imgWidth = 12; 
+                        const imgHeight = 22;
+                        ctx.drawImage(mobileImg, simState.mobileUser.x - imgWidth / 2, simState.mobileUser.y - imgHeight / 2, imgWidth, imgHeight);
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(simState.mobileUser.x, simState.mobileUser.y, 5, 0, 2 * Math.PI);
+                        ctx.fillStyle = 'blue';
+                        ctx.fill();
+                        ctx.strokeStyle = 'white';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            function drawHexagon(x, y, size, fill = false) {
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = Math.PI / 6 + Math.PI / 3 * i;
+                    ctx.lineTo(x + size * Math.cos(angle), y + size * Math.sin(angle));
+                }
+                ctx.closePath();
+                ctx.strokeStyle = '#aaa';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                if(fill) ctx.fill();
+            }
+
+            function drawTower(x, y) {
+                if (towerImgLoaded) {
+                    const imgHeight = 20;
+                    const imgWidth = 12;
+                    ctx.drawImage(towerImg, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x, y - 15);
+                    ctx.moveTo(x - 5, y - 15);
+                    ctx.lineTo(x + 5, y - 15);
+                    ctx.strokeStyle = 'black';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+
+            // --- MODIFIED FUNCTION ---
+            function drawSectors(x, y, radius, beamWidth) {
+                const rotation = parseFloat(controls.rotate.value) * Math.PI / 180;
+                const angles = [30, 150, 270];
+                const beamRad = beamWidth * Math.PI / 180; // Use beamWidth from control
+                ctx.save();
+                ctx.globalAlpha = 0.35;
+                
+                const colors = [sectorColors[1], sectorColors[2], sectorColors[3]];
+                
+                angles.forEach((angle, i) => {
+                    const startAngle = (angle - beamWidth / 2) * Math.PI / 180 + rotation;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.arc(x, y, radius * 0.95, startAngle, startAngle + beamRad);
+                    ctx.closePath();
+                    ctx.fillStyle = colors[i];
+                    ctx.fill();
+                });
+                ctx.restore();
+            }
+
+            function calculateSINR(user) {
+                if (!user) return null;
+
+                const Ptx_watts = dBmToWatts(parseFloat(controls.txPower.value));
+                const n = parseFloat(controls.pathLossExp.value);
+                const sigma = parseFloat(controls.shadowingStdDev.value);
+                const fc = parseFloat(controls.fc.value);
+                const scale = parseFloat(controls.cellRadius.value) / simState.cellRadiusPixels;
+
+                let minDistance = Infinity;
+                let servingBs = null;
+                simState.baseStations.forEach(bs => {
+                    const dist = Math.sqrt(Math.pow(user.x - bs.x, 2) + Math.pow(user.y - bs.y, 2));
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        servingBs = bs;
+                    }
+                });
+                user.servingBs = servingBs;
+                const distanceToServingBs_meters = minDistance * scale;
+
+                const pathLossAt1m = 20 * Math.log10(fc) + 32.44;
+                let pathLossDb = (distanceToServingBs_meters > 1) 
+                    ? pathLossAt1m + 10 * n * Math.log10(distanceToServingBs_meters)
+                    : pathLossAt1m;
+                
+                if (controls.shadowing.checked) {
+                    pathLossDb += gaussianRandom() * sigma;
+                }
+                const receivedPower_watts = Ptx_watts / dBToLinear(pathLossDb);
+
+                let totalInterference_watts = 0;
+                const coChannelCells = simState.baseStations.filter(bs => bs.isCoChannel);
+                
+                let interferers = coChannelCells;
+                if (controls.sectorized.checked && coChannelCells.length > 2) {
+                    interferers = coChannelCells.sort((a, b) => {
+                        const distA = Math.sqrt(Math.pow(user.x - a.x, 2) + Math.pow(user.y - a.y, 2));
+                        const distB = Math.sqrt(Math.pow(user.x - b.x, 2) + Math.pow(user.y - b.y, 2));
+                        return distA - distB;
+                    }).slice(0, 2);
+                }
+
+                interferers.forEach(bs => {
+                    const dist_m = Math.sqrt(Math.pow(user.x - bs.x, 2) + Math.pow(user.y - bs.y, 2)) * scale;
+                    let interferencePathLossDb = (dist_m > 1)
+                        ? pathLossAt1m + 10 * n * Math.log10(dist_m)
+                        : pathLossAt1m;
+
+                    if (controls.shadowing.checked) {
+                        interferencePathLossDb += gaussianRandom() * sigma;
+                    }
+                    totalInterference_watts += Ptx_watts / dBToLinear(interferencePathLossDb);
+                });
+                
+                const noise_watts = dBmToWatts(-101);
+                const sinr_linear = receivedPower_watts / (totalInterference_watts + noise_watts);
+                const sinr_dB = linearToDB(sinr_linear);
+
+                let sector = 0;
+                if (controls.sectorized.checked) {
+                    const dx = user.x - servingBs.x;
+                    const dy = user.y - servingBs.y;
+                    let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                    if (angle < 0) angle += 360;
+                    
+                    const rotation = parseFloat(controls.rotate.value);
+                    angle = (angle - rotation + 360) % 360;
+
+                    if (angle >= 330 || angle < 90) sector = 1;
+                    else if (angle >= 90 && angle < 210) sector = 2;
+                    else sector = 3;
+                }
+
+                return {
+                    sinr_dB: sinr_dB,
+                    distance_m: distanceToServingBs_meters,
+                    servingBsId: servingBs.id,
+                    sector: sector
+                };
+            }
+
+            function updateOutput(result) {
+                outputDiv.innerHTML = `
+                    <div>- ${result.sinr_dB.toFixed(12)}...</div>
+                    <div>- ${result.distance_m.toFixed(12)}...</div>
+                    <div>BS ID: ${result.servingBsId}</div>
+                    <div>Sector: ${result.sector}</div>
+                `;
+            }
+
+            function updateReadingWindows(result) {
+                const sinrDisplay = document.getElementById('sinrDisplay');
+                const distanceDisplay = document.getElementById('distanceDisplay');
+
+                if (result) {
+                    sinrDisplay.innerHTML = `<div>SINR(dB)</div><div>${result.sinr_dB.toFixed(2)}</div>`;
+                    distanceDisplay.innerHTML = `<div>d(m)</div><div>${result.distance_m.toFixed(2)}</div>`;
+                } else {
+                    sinrDisplay.innerHTML = `<div>SINR(dB)</div><div>--</div>`;
+                    distanceDisplay.innerHTML = `<div>d(m)</div><div>--</div>`;
+                }
+            }
+            
+            function updateSinrVsDistanceChart() {
+                const grouping = controls.colorGrouping.value;
+                const dataPoints = simState.sinrHistory;
+                const pointColors = [];
+                
+                for(const point of dataPoints) {
+                    if (grouping === 'sector') {
+                        pointColors.push(sectorColors[point.sector] || sectorColors[0]);
+                    } else if (grouping === 'bsid') {
+                        pointColors.push(getColorForBsId(point.servingBsId));
+                    } else {
+                        pointColors.push('rgba(255, 99, 132, 0.8)');
+                    }
+                }
+                
+                sinrVsDistanceChart.data.datasets[0].data = dataPoints.map(p => ({
+                    x: p.distance_m,
+                    y: p.sinr_dB
+                }));
+
+                sinrVsDistanceChart.data.datasets[0].backgroundColor = pointColors;
+                sinrVsDistanceChart.update();
+            }
+
+            function runMonteCarlo(numPoints) {
+                const centralCell = simState.baseStations.find(bs => bs.q === 0 && bs.r === 0);
+                if (!centralCell) return [];
+                const results = [];
+                for (let i = 0; i < numPoints; i++) {
+                    const angle = Math.random() * 2 * Math.PI;
+                    const radius = Math.sqrt(Math.random()) * simState.cellRadiusPixels; 
+                    const user = { x: centralCell.x + radius * Math.cos(angle), y: centralCell.y + radius * Math.sin(angle) };
+                    const result = calculateSINR(user);
+                    if (result) results.push(result);
+                }
+                return results;
+            }
+
+            function plotCDF(sinrValues, legendText) {
+                sinrValues.sort((a, b) => a - b);
+                const cdfData = [];
+                const labels = [];
+                for (let i = 0; i < sinrValues.length; i++) {
+                    labels.push(sinrValues[i].toFixed(2));
+                    cdfData.push((i + 1) / sinrValues.length);
+                }
+                
+                cdfChart.data.labels = labels;
+                cdfChart.data.datasets[0].data = cdfData;
+                
+                const legendDiv = document.getElementById('cdfChartLegend');
+                legendDiv.textContent = legendText;
+
+                cdfChart.update();
+                cdfModal.style.display = 'flex';
+                
+                controls.report.disabled = false;
+            }
+            
+            function resetSimulation() {
+                simState.isDragging = false;
+                simState.sinrHistory = [];
+                controls.report.disabled = true;
+                bsColorMap = {};
+                
+                const baseRadius = 500; 
+                const baseFitFactor = 5; 
+                const currentRadius = parseFloat(controls.cellRadius.value) || baseRadius; 
+                const newFitFactor = (baseRadius / currentRadius) * baseFitFactor;
+                const effectiveFitFactor = Math.max(newFitFactor, 1.5); 
+                simState.cellRadiusPixels = canvas.width / (2 * effectiveFitFactor);
+
+                generateBaseStations();
+                markCoChannelCells();
+
+                const centralCell = simState.baseStations.find(bs => bs.q === 0 && bs.r === 0);
+                if(centralCell) {
+                    simState.mobileUser = { x: centralCell.x, y: centralCell.y, servingBs: null };
+                    const initialResult = calculateSINR(simState.mobileUser);
+                     if (initialResult) {
+                        simState.sinrHistory = [initialResult];
+                        updateReadingWindows(initialResult);
+                        updateOutput(initialResult);
+                     }
+                } else {
+                     simState.mobileUser = { x: canvas.width / 2, y: canvas.height/2, servingBs: null };
+                }
+
+                updateSinrVsDistanceChart();
+                draw();
+            }
+
+            function handleCdfPlot() {
+                let sinrValues;
+                const envText = controls.environment.options[controls.environment.selectedIndex].text;
+                const reuseValue = controls.reuse.value;
+                const legendText = `${envText} N = ${reuseValue}`;
+
+                if (controls.autoPlot.checked) {
+                    const results = runMonteCarlo(26);
+                    if (results.length === 0) {
+                        alert("Could not generate data for the plot.");
+                        return;
+                    }
+                    sinrValues = results.map(r => r.sinr_dB);
+                } else {
+                    const minPoints = 25;
+                    if (simState.sinrHistory.length < minPoints) {
+                        alert(`You have only collected ${simState.sinrHistory.length} points. Please drag the mobile icon to collect at least ${minPoints} points.`);
+                        return;
+                    }
+                    sinrValues = simState.sinrHistory.map(r => r.sinr_dB);
+                }
+
+                plotCDF(sinrValues, legendText);
+            }
+            
+            function handleReport() {
+                const { jsPDF } = window.jspdf;
+
+                const reportContainer = document.createElement('div');
+                reportContainer.style.position = 'absolute';
+                reportContainer.style.left = '-9999px';
+                reportContainer.style.width = '210mm';
+                reportContainer.style.padding = '10mm';
+                reportContainer.style.backgroundColor = 'white';
+
+                document.body.appendChild(reportContainer);
+
+                const reportParams = [
+                    { label: 'PL Model', value: controls.environment.options[controls.environment.selectedIndex].text },
+                    { label: 'Beam Width', value: `${controls.beamWidth.value} deg` },
+                    { label: 'Rotate', value: `${controls.rotate.value} deg` },
+                    { label: 'Cell Radius', value: `${controls.cellRadius.value} m` },
+                    { label: 'Tx Power', value: `${controls.txPower.value} dBm` },
+                    { label: 'fc', value: `${controls.fc.value} GHz` },
+                    { label: 'hTX', value: `${controls.ht.value} m` },
+                    { label: 'hRX', value: `${controls.hr.value} m` },
+                    { label: 'Sigma', value: `${controls.shadowingStdDev.value} dB` },
+                    { label: 'Vertical Tilt', value: `${controls.verticalTilt.value} deg` },
+                    { label: 'np', value: controls.pathLossExp.value },
+                    { label: 'Sectoring', value: controls.sectorized.checked ? 'Yes' : 'No' },
+                    { label: 'Shadowing', value: controls.shadowing.checked ? 'Yes' : 'No' },
+                    { label: 'Reuse', value: controls.reuse.value },
+                ];
+
+                const paramsHtml = reportParams.map(p => `
+                    <tr>
+                        <td style="background-color: #ef4444; color: white; font-weight: bold; padding: 4px; border: 1px solid #9ca3af; font-size: 12px;">${p.label}</td>
+                        <td style="padding: 4px; border: 1px solid #9ca3af; font-size: 12px; text-align: center;">${p.value}</td>
+                    </tr>
+                `).join('');
+
+                const cdfImage = cdfChart.toBase64Image();
+                const dateString = new Date().toLocaleString();
+                const legendText = document.getElementById('cdfChartLegend').textContent;
+
+                reportContainer.innerHTML = `
+                    <div style="font-family: sans-serif;">
+                        <header style="margin-bottom: 1rem;">
+                            <h1 style="font-size: 1.25rem; font-weight: bold;">Fading Channels & Mobile Communications</h1>
+                            <h2 style="font-size: 1.125rem;">IIT Kharagpur</h2>
+                            <div style="font-size: 0.875rem; color: #4b5563;">
+                                <div>Date: ${dateString}</div>
+                                <div style="margin-top: 1rem;"><b>Exp 7: Sectoring</b></div>
+                                <div>Name: ${simState.userName}</div>
+                            </div>
+                        </header>
+                        <hr style="border-color: black; margin-bottom: 2rem;">
+
+                        <main style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
+                            <div>
+                                <h3 style="text-align: center; font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">CDF of SINR</h3>
+                                <img src="${cdfImage}" alt="CDF Plot" style="width: 100%;">
+                                <div style="border: 1px solid #ccc; text-align: center; padding: 4px; margin: 0 auto; margin-top: 8px; font-weight: bold; width: 120px;">${legendText}</div>
+                            </div>
+                            <div>
+                                <table style="width: 100%; border-collapse: collapse; border: 1px solid #9ca3af;">
+                                    ${paramsHtml}
+                                </table>
+                            </div>
+                        </main>
+
+                        <footer style="margin-top: 6rem; display: flex; justify-content: space-between; font-size: 0.875rem;">
+                            <div>
+                                <p>(Signature of ${simState.userName})</p>
+                                <div style="margin-top: 0.5rem; border-top: 1px solid black; width: 12rem;"></div>
+                            </div>
+                            <div>
+                                <p>(Signature of Faculty)</p>
+                                <div style="margin-top: 0.5rem; border-top: 1px solid black; width: 12rem;"></div>
+                            </div>
+                        </footer>
+                    </div>
+                `;
+
+                setTimeout(() => {
+                    html2canvas(reportContainer, { scale: 2 }).then(canvas => {
+                        const imgData = canvas.toDataURL('image/png');
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const canvasWidth = canvas.width;
+                        const canvasHeight = canvas.height;
+                        const ratio = canvasHeight / canvasWidth;
+                        const imgHeight = pdfWidth * ratio;
+                        
+                        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
+                        pdf.save('report.pdf');
+
+                        document.body.removeChild(reportContainer);
+                    });
+                }, 500);
+            }
+
+            function resetControlsToDefaults() {
+                controls.environment.value = 'rune';
+                controls.reuse.value = '1';
+                controls.beamWidth.value = '120'; // Default to 120
+                controls.rotate.value = 0;
+                controls.cellRadius.value = 500;
+                controls.txPower.value = 41;
+                controls.fc.value = 2.0;
+                controls.ht.value = 10;
+                controls.hr.value = 1.5;
+                controls.verticalTilt.value = 6;
+                controls.sectorized.checked = true;
+                controls.shadowing.checked = true;
+                controls.grid.checked = true;
+                controls.autoPlot.checked = false;
+            }
+
+            function handleEnvironmentChange() {
+                const selectedEnv = controls.environment.value;
+                const params = environmentParams[selectedEnv];
+                
+                if(params) {
+                    controls.pathLossExp.value = params.np;
+                    controls.shadowingStdDev.value = params.sigma;
+                    controls.pathLossExp.disabled = true;
+                    controls.shadowingStdDev.disabled = true;
+                }
+                resetSimulation();
+            }
+            
+            function handleMouseDown(event) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = event.clientX - rect.left;
+                const mouseY = event.clientY - rect.top;
+                
+                const dx = mouseX - simState.mobileUser.x;
+                const dy = mouseY - simState.mobileUser.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+
+                if (dist < 15) {
+                    simState.isDragging = true;
+                    canvas.style.cursor = 'grabbing';
+                }
+            }
+
+            function handleMouseMove(event) {
+                if (!simState.isDragging) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                simState.mobileUser.x = event.clientX - rect.left;
+                simState.mobileUser.y = event.clientY - rect.top;
+
+                const result = calculateSINR(simState.mobileUser);
+                if (result) {
+                    updateOutput(result);
+                    updateReadingWindows(result);
+                }
+                draw();
+            }
+
+            function handleMouseUp() {
+                if(simState.isDragging) {
+                    simState.isDragging = false;
+                    canvas.style.cursor = 'grab';
+
+                    const result = calculateSINR(simState.mobileUser);
+                    if (result) {
+                        simState.sinrHistory.push(result);
+                        updateSinrVsDistanceChart();
+                    }
+                }
+            }
+
+            function setup() {
+                const container = canvas.parentElement;
+                const size = Math.min(container.clientWidth, container.clientHeight);
+                canvas.width = size;
+                canvas.height = size;
+
+                populateReuseSelector();
+
+                canvas.addEventListener('mousedown', handleMouseDown);
+                canvas.addEventListener('mousemove', handleMouseMove);
+                canvas.addEventListener('mouseup', handleMouseUp);
+                canvas.addEventListener('mouseout', handleMouseUp);
+
+                resetBtn.addEventListener('click', () => {
+                    cdfModal.style.display = 'none';
+                    resetControlsToDefaults();
+                    handleEnvironmentChange();
+                });
+                cdfPlotBtn.addEventListener('click', handleCdfPlot);
+                reportBtn.addEventListener('click', handleReport);
+                closeCdfModalBtn.addEventListener('click', () => cdfModal.style.display = 'none');
+                
+                Object.values(controls).forEach(control => {
+                    const resetOnChange = ['reuse', 'beamWidth', 'rotate', 'txPower', 'fc', 'ht', 'hr', 'verticalTilt', 'sectorized', 'shadowing', 'grid', 'autoPlot'];
+                    if (resetOnChange.includes(control.id)) { 
+                        control.addEventListener('change', resetSimulation);
+                    }
+                });
+
+                controls.cellRadius.addEventListener('input', resetSimulation);
+                controls.environment.addEventListener('change', handleEnvironmentChange);
+                controls.colorGrouping.addEventListener('change', updateSinrVsDistanceChart);
+                
+                submitNameBtn.addEventListener('click', () => {
+                   const name = userNameInput.value.trim();
+                   if (name) {
+                       simState.userName = name;
+                       nameModal.style.display = 'none';
+                   }
+                });
+
+                initCharts();
+                handleEnvironmentChange();
+            }
+
+            setup();
+        });
+    </script>
+</body>
+</html>
