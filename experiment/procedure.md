@@ -2,7 +2,7 @@
 
 Follow the instructions given below to perform the experiments:-
 
-* Step 1:- A page appears with a dialogue box asking for your name. Enter your name then Click Ok.
+* Step 1:- A page appears with a dialogue box asking for your name. Enter your name then Click 'Start Simulation'.
 
    <div align="center">
     <img src="images/instruction1.png" alt="Large Scale Fading">  
