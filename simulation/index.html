@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sectoring Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #simulationCanvas {
+            cursor: grab;
+        }
+        .control-panel label {
+            font-weight: 500;
+        }
+        .control-panel input, .control-panel select {
+            width: 100%;
+            padding: 4px 8px;
+            border-radius: 0.375rem;
+            border: 1px solid #D1D5DB;
+        }
+        /* Style for disabled inputs */
+        .control-panel input:disabled, .control-panel select:disabled {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+        }
+        .control-panel .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .control-panel .input-group input {
+            flex-grow: 1;
+        }
+        .control-panel .input-group .unit {
+            white-space: nowrap;
+        }
+        .output-display {
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            border-radius: 0.375rem;
+            height: 120px;
+        }
+        .reading-window {
+            height: 150px;
+            background-color: #fefce8; /* Light yellow */
+            border: 1px solid #eab308; /* Amber */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4">
+        <header class="text-center mb-4">
+            
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            
+            <div class="lg:col-span-2 bg-white p-2 rounded-lg shadow-md aspect-square">
+                <canvas id="simulationCanvas"></canvas>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col gap-4">
+                <div class="control-panel grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <div class="col-span-2">
+                        <button id="resetBtn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">Reset</button>
+                    </div>
+                    
+                    <div class="col-span-2">
+                        <label for="environment">PL Model</label>
+                        <select id="environment">
+                            <option value="rune" selected>Rune</option>
+                            <option value="urban_micro">Urban Micro</option>
+                            <option value="urban_macro">Urban Macro</option>
+                            <option value="suburban_macro">Suburban Macro</option>
+                            <option value="rural_macro">Rural Macro</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="reuse">Reuse (N)</label>
+                        <select id="reuse">
+                            </select>
+                    </div>
+
+                    <div>
+                        <label for="beamWidth">Beam Width</label>
+                        <div class="input-group">
+                            <input type="number" id="beamWidth" value="120" step="10">
+                            <button class="bg-gray-200 px-2 py-1 rounded-md">Set</button>
+                        </div>
+                    </div>
+                    <div class="input-group col-span-2">
+                        <label for="rotate" class="whitespace-nowrap">Rotate</label>
+                        <input type="number" id="rotate" value="0" step="1">
+                        <button class="bg-gray-200 px-2 py-1 rounded-md">Set</button>
+                    </div>
+
+                    <div><label for="cellRadius">Cell Radius(m)</label><input type="number" id="cellRadius" value="500" step="50"></div>
+                    <div><label for="txPower">Ptx(dBm)</label><input type="number" id="txPower" value="41" step="1"></div>
+                    <div><label for="fc">fc(GHz)</label><input type="number" id="fc" value="2.0" step="0.1"></div>
+                    <div><label for="ht">HT(m)</label><input type="number" id="ht" value="10" step="1"></div>
+                    <div><label for="hr">HR(m)</label><input type="number" id="hr" value="1.5" step="0.1"></div>
+                    <div><label for="shadowingStdDev">Sigma(dB)</label><input type="number" id="shadowingStdDev" value="8" step="1"></div>
+                    <div><label for="verticalTilt">Vertical tilt(deg)</label><input type="number" id="verticalTilt" value="6" step="1"></div>
+                    <div><label for="pathLossExp">np</label><input type="number" id="pathLossExp" value="2.5" step="0.1"></div>
+
+                    <div class="col-span-2 grid grid-cols-3 gap-2 mt-2">
+                         <div class="flex items-center gap-1"><input type="checkbox" id="sectorized" class="h-4 w-4 rounded" checked><label for="sectorized">Sectorized</label></div>
+                         <div class="flex items-center gap-1"><input type="checkbox" id="shadowing" class="h-4 w-4 rounded" checked><label for="shadowing">Shadowing</label></div>
+                         <div class="flex items-center gap-1"><input type="checkbox" id="grid" class="h-4 w-4 rounded" checked><label for="grid">Grid</label></div>
+                         <div class="flex items-center gap-1 col-span-3"><input type="checkbox" id="autoPlot" class="h-4 w-4 rounded"><label for="autoPlot">Auto Plot</label></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div id="sinrDisplay" class="reading-window col-span-1 p-2">
+                        <div>SINR(dB)</div>
+                        <div>--</div>
+                    </div>
+                    <div id="distanceDisplay" class="reading-window col-span-1 p-2">
+                        <div>d(m)</div>
+                        <div>--</div>
+                    </div>
+                </div>
+
+                <div id="output" class="output-display"></div>
+                 <div class="grid grid-cols-2 gap-4">
+                        <button id="reportBtn" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>Report</button>
+                        <button id="cdfPlotBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">CDF Plot</button>
+                </div>
+
+                <div class="mt-4 border-t pt-4">
+                    <div class="mb-2 text-sm">
+                        <label for="colorGrouping" class="font-medium">Color Points By:</label>
+                        <select id="colorGrouping" class="w-full p-1 border rounded-md">
+                            <option value="sector" selected>Sector</option>
+                            <option value="bsid">BS ID</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <canvas id="sinrVsDistanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cdfModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-3xl">
+            <h3 class="text-center text-xl font-bold mb-4">CDF of SINR</h3>
+            <canvas id="cdfChart"></canvas>
+            <div id="cdfChartLegend" class="text-center mt-2 font-semibold border rounded-md p-1 bg-gray-50"></div>
+            <button id="closeCdfModal" class="mt-4 w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">Close</button>
+        </div>
+    </div>
+    
+    <div id="nameModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-sm text-center">
+            <h3 class="text-xl font-bold mb-4">Welcome!</h3>
+            <p class="text-gray-600 mb-4">What is your name?</p>
+            <input type="text" id="userName" class="w-full p-2 border border-gray-300 rounded-md mb-4" placeholder="Enter your name">
+            <button id="submitName" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Start Simulation</button>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileImg = new Image();
+            mobileImg.src = 'images/mobiles.png';
+            let mobileImgLoaded = false;
+            mobileImg.onload = () => {
+                mobileImgLoaded = true;
+                if (simState.mobileUser) { 
+                    draw();
+                }
+            };
+
+            const towerImg = new Image();
+            towerImg.src = 'images/tower.png';
+            let towerImgLoaded = false;
+            towerImg.onload = () => {
+                towerImgLoaded = true;
+                draw();
+            };
+
+            const canvas = document.getElementById('simulationCanvas');
+            const ctx = canvas.getContext('2d');
+            const outputDiv = document.getElementById('output');
+            const nameModal = document.getElementById('nameModal');
+            const cdfModal = document.getElementById('cdfModal');
+            
+            const controls = {
+                environment: document.getElementById('environment'),
+                reuse: document.getElementById('reuse'),
+                beamWidth: document.getElementById('beamWidth'),
+                rotate: document.getElementById('rotate'),
+                cellRadius: document.getElementById('cellRadius'),
+                txPower: document.getElementById('txPower'),
+                fc: document.getElementById('fc'),
+                ht: document.getElementById('ht'),
+                hr: document.getElementById('hr'),
+                verticalTilt: document.getElementById('verticalTilt'),
+                pathLossExp: document.getElementById('pathLossExp'),
+                shadowingStdDev: document.getElementById('shadowingStdDev'),
+                sectorized: document.getElementById('sectorized'),
+                shadowing: document.getElementById('shadowing'),
+                grid: document.getElementById('grid'),
+                autoPlot: document.getElementById('autoPlot'),
+                report: document.getElementById('reportBtn'),
+                colorGrouping: document.getElementById('colorGrouping'),
+            };
+
+            const environmentParams = {
+                rune: { np: 2.5, sigma: 8 },
+                urban_micro: { np: 3.5, sigma: 6 },
+                urban_macro: { np: 3.0, sigma: 8 },
+                suburban_macro: { np: 2.5, sigma: 10 },
+                rural_macro: { np: 2.2, sigma: 12 }
+            };
+
+            const sectorColors = {
+                1: 'rgba(255, 99, 132, 0.9)',
+                2: 'rgba(54, 162, 235, 0.9)',
+                3: 'rgba(255, 206, 86, 0.9)',
+                0: 'rgba(150, 150, 150, 0.9)'
+            };
+            let bsColorMap = {};
+
+            const resetBtn = document.getElementById('resetBtn');
+            const cdfPlotBtn = document.getElementById('cdfPlotBtn');
+            const reportBtn = document.getElementById('reportBtn');
+            const closeCdfModalBtn = document.getElementById('closeCdfModal');
+            const submitNameBtn = document.getElementById('submitName');
+            const userNameInput = document.getElementById('userName');
+
+            let simState = {
+                cellRadiusPixels: 100,
+                baseStations: [],
+                mobileUser: null,
+                userName: 'Goutam',
+                sinrHistory: [],
+                isDragging: false,
+            };
+
+            let cdfChart;
+            let sinrVsDistanceChart;
+
+            const dBmToWatts = (dBm) => Math.pow(10, (dBm - 30) / 10);
+            const wattsToDBm = (watts) => 10 * Math.log10(watts) + 30;
+            const dBToLinear = (dB) => Math.pow(10, dB / 10);
+            const linearToDB = (linear) => 10 * Math.log10(linear);
+            
+            const gaussianRandom = () => {
+                let u = 0, v = 0;
+                while(u === 0) u = Math.random();
+                while(v === 0) v = Math.random();
+                return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+            };
+            
+            const getRandomColor = () => {
+                const r = Math.floor(Math.random() * 200);
+                const g = Math.floor(Math.random() * 200);
+                const b = Math.floor(Math.random() * 200);
+                return `rgba(${r}, ${g}, ${b}, 0.9)`;
+            };
+            
+            const getColorForBsId = (id) => {
+                if (!bsColorMap[id]) {
+                    bsColorMap[id] = getRandomColor();
+                }
+                return bsColorMap[id];
+            };
+
+            function populateReuseSelector() {
+                const reuseSelect = controls.reuse;
+                const validN = [1, 3, 4, 7, 9, 12];
+                reuseSelect.innerHTML = ''; 
+
+                for (const nValue of validN) {
+                    const option = document.createElement('option');
+                    option.value = nValue;
+                    option.textContent = nValue;
+
+                    if (nValue === 1) {
+                        option.selected = true;
+                    }
+                    reuseSelect.appendChild(option);
+                }
+            }
+
+            function initCharts() {
+                const cdfCtx = document.getElementById('cdfChart').getContext('2d');
+                cdfChart = new Chart(cdfCtx, {
+                    type: 'line',
+                    data: { labels: [], datasets: [{ 
+                        label: 'CDF of SINR', 
+                        data: [], 
+                        borderColor: 'rgba(0, 0, 0, 1)',
+                        backgroundColor: 'rgba(0, 0, 0, 1)',
+                        borderWidth: 2,
+                        tension: 0.2,
+                        pointStyle: 'rectRot',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }] },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: { title: { display: true, text: 'SINR (dB)' } },
+                            y: { title: { display: true, text: 'CDF' }, min: 0, max: 1.0 }
+                        }
+                    }
+                });
+
+                const svdCtx = document.getElementById('sinrVsDistanceChart').getContext('2d');
+                sinrVsDistanceChart = new Chart(svdCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'SINR(dB) vs Dist(m)',
+                            data: [],
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                            pointRadius: 5,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                             legend: {
+                                display: false,
+                             }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: { display: true, text: 'Distance (m)' }
+                            },
+                            y: {
+                                title: { display: true, text: 'SINR (dB)' }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function getIJForReuse(N) {
+                for (let i = 0; i <= N; i++) {
+                    for (let j = 0; j <= N; j++) {
+                        if (i * i + i * j + j * j === N) return { i, j };
+                    }
+                }
+                return { i: 1, j: 0 }; 
+            }
+
+            function generateBaseStations() {
+                simState.baseStations = [];
+                const R = simState.cellRadiusPixels;
+                const numRings = 6;
+                let cellId = 66; 
+                for (let r = -numRings; r <= numRings; r++) {
+                    for (let q = -numRings; q <= numRings; q++) {
+                         if (Math.abs(q + r) > numRings) continue;
+                        const x = canvas.width / 2 + R * (Math.sqrt(3) * q + Math.sqrt(3) / 2 * r);
+                        const y = canvas.height / 2 + R * (3 / 2 * r);
+                        if (x > -R * 1.5 && x < canvas.width + R * 1.5 && y > -R * 1.5 && y < canvas.height + R * 1.5) {
+                           simState.baseStations.push({ id: cellId++, x, y, q, r, isCoChannel: false });
+                        }
+                    }
+                }
+            }
+
+            function markCoChannelCells() {
+                const N = parseInt(controls.reuse.value);
+                if (N === 1) {
+                    simState.baseStations.forEach(bs => {
+                        if (bs.q !== 0 || bs.r !== 0) {
+                            bs.isCoChannel = true;
+                        }
+                    });
+                    return;
+                }
+                const { i, j } = getIJForReuse(N);
+                simState.baseStations.forEach(bs => bs.isCoChannel = false);
+                const directions = [
+                    { u: i, v: j }, { u: -j, v: i + j }, { u: -i - j, v: i },
+                    { u: -i, v: -j }, { u: j, v: -i - j }, { u: i + j, v: -i }
+                ];
+                directions.forEach(dir => {
+                    const coChannelCell = simState.baseStations.find(bs => bs.q === dir.u && bs.r === dir.v);
+                    if (coChannelCell) coChannelCell.isCoChannel = true;
+                });
+            }
+            
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const R = simState.cellRadiusPixels;
+
+                simState.baseStations.forEach(bs => {
+                    if(controls.grid.checked) {
+                        drawHexagon(bs.x, bs.y, R);
+                    }
+                    if (bs.isCoChannel) {
+                        ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+                        ctx.fill();
+                    }
+                });
+                
+                if(simState.mobileUser && simState.mobileUser.servingBs) {
+                    ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+                    drawHexagon(simState.mobileUser.servingBs.x, simState.mobileUser.servingBs.y, R, true);
+                }
+
+                simState.baseStations.forEach(bs => {
+                    drawTower(bs.x, bs.y);
+                    if (controls.sectorized.checked) {
+                        drawSectors(bs.x, bs.y, R, parseInt(controls.beamWidth.value));
+                    }
+                    ctx.fillStyle = 'black';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(bs.id, bs.x, bs.y + R * 0.6);
+                });
+
+                if (simState.mobileUser) {
+                    if (mobileImgLoaded) {
+                        const imgWidth = 12; 
+                        const imgHeight = 22;
+                        ctx.drawImage(mobileImg, simState.mobileUser.x - imgWidth / 2, simState.mobileUser.y - imgHeight / 2, imgWidth, imgHeight);
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(simState.mobileUser.x, simState.mobileUser.y, 5, 0, 2 * Math.PI);
+                        ctx.fillStyle = 'blue';
+                        ctx.fill();
+                        ctx.strokeStyle = 'white';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            function drawHexagon(x, y, size, fill = false) {
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = Math.PI / 6 + Math.PI / 3 * i;
+                    ctx.lineTo(x + size * Math.cos(angle), y + size * Math.sin(angle));
+                }
+                ctx.closePath();
+                ctx.strokeStyle = '#aaa';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                if(fill) ctx.fill();
+            }
+
+            function drawTower(x, y) {
+                if (towerImgLoaded) {
+                    const imgHeight = 20;
+                    const imgWidth = 12;
+                    ctx.drawImage(towerImg, x - imgWidth / 2, y - imgHeight / 2, imgWidth, imgHeight);
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x, y - 15);
+                    ctx.moveTo(x - 5, y - 15);
+                    ctx.lineTo(x + 5, y - 15);
+                    ctx.strokeStyle = 'black';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+
+            // --- MODIFIED FUNCTION ---
+            function drawSectors(x, y, radius, beamWidth) {
+                const rotation = parseFloat(controls.rotate.value) * Math.PI / 180;
+                const angles = [30, 150, 270];
+                const beamRad = beamWidth * Math.PI / 180; // Use beamWidth from control
+                ctx.save();
+                ctx.globalAlpha = 0.35;
+                
+                const colors = [sectorColors[1], sectorColors[2], sectorColors[3]];
+                
+                angles.forEach((angle, i) => {
+                    const startAngle = (angle - beamWidth / 2) * Math.PI / 180 + rotation;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.arc(x, y, radius * 0.95, startAngle, startAngle + beamRad);
+                    ctx.closePath();
+                    ctx.fillStyle = colors[i];
+                    ctx.fill();
+                });
+                ctx.restore();
+            }
+
+            function calculateSINR(user) {
+                if (!user) return null;
+
+                const Ptx_watts = dBmToWatts(parseFloat(controls.txPower.value));
+                const n = parseFloat(controls.pathLossExp.value);
+                const sigma = parseFloat(controls.shadowingStdDev.value);
+                const fc = parseFloat(controls.fc.value);
+                const scale = parseFloat(controls.cellRadius.value) / simState.cellRadiusPixels;
+
+                let minDistance = Infinity;
+                let servingBs = null;
+                simState.baseStations.forEach(bs => {
+                    const dist = Math.sqrt(Math.pow(user.x - bs.x, 2) + Math.pow(user.y - bs.y, 2));
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        servingBs = bs;
+                    }
+                });
+                user.servingBs = servingBs;
+                const distanceToServingBs_meters = minDistance * scale;
+
+                const pathLossAt1m = 20 * Math.log10(fc) + 32.44;
+                let pathLossDb = (distanceToServingBs_meters > 1) 
+                    ? pathLossAt1m + 10 * n * Math.log10(distanceToServingBs_meters)
+                    : pathLossAt1m;
+                
+                if (controls.shadowing.checked) {
+                    pathLossDb += gaussianRandom() * sigma;
+                }
+                const receivedPower_watts = Ptx_watts / dBToLinear(pathLossDb);
+
+                let totalInterference_watts = 0;
+                const coChannelCells = simState.baseStations.filter(bs => bs.isCoChannel);
+                
+                let interferers = coChannelCells;
+                if (controls.sectorized.checked && coChannelCells.length > 2) {
+                    interferers = coChannelCells.sort((a, b) => {
+                        const distA = Math.sqrt(Math.pow(user.x - a.x, 2) + Math.pow(user.y - a.y, 2));
+                        const distB = Math.sqrt(Math.pow(user.x - b.x, 2) + Math.pow(user.y - b.y, 2));
+                        return distA - distB;
+                    }).slice(0, 2);
+                }
+
+                interferers.forEach(bs => {
+                    const dist_m = Math.sqrt(Math.pow(user.x - bs.x, 2) + Math.pow(user.y - bs.y, 2)) * scale;
+                    let interferencePathLossDb = (dist_m > 1)
+                        ? pathLossAt1m + 10 * n * Math.log10(dist_m)
+                        : pathLossAt1m;
+
+                    if (controls.shadowing.checked) {
+                        interferencePathLossDb += gaussianRandom() * sigma;
+                    }
+                    totalInterference_watts += Ptx_watts / dBToLinear(interferencePathLossDb);
+                });
+                
+                const noise_watts = dBmToWatts(-101);
+                const sinr_linear = receivedPower_watts / (totalInterference_watts + noise_watts);
+                const sinr_dB = linearToDB(sinr_linear);
+
+                let sector = 0;
+                if (controls.sectorized.checked) {
+                    const dx = user.x - servingBs.x;
+                    const dy = user.y - servingBs.y;
+                    let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                    if (angle < 0) angle += 360;
+                    
+                    const rotation = parseFloat(controls.rotate.value);
+                    angle = (angle - rotation + 360) % 360;
+
+                    if (angle >= 330 || angle < 90) sector = 1;
+                    else if (angle >= 90 && angle < 210) sector = 2;
+                    else sector = 3;
+                }
+
+                return {
+                    sinr_dB: sinr_dB,
+                    distance_m: distanceToServingBs_meters,
+                    servingBsId: servingBs.id,
+                    sector: sector
+                };
+            }
+
+            function updateOutput(result) {
+                outputDiv.innerHTML = `
+                    <div>- ${result.sinr_dB.toFixed(12)}...</div>
+                    <div>- ${result.distance_m.toFixed(12)}...</div>
+                    <div>BS ID: ${result.servingBsId}</div>
+                    <div>Sector: ${result.sector}</div>
+                `;
+            }
+
+            function updateReadingWindows(result) {
+                const sinrDisplay = document.getElementById('sinrDisplay');
+                const distanceDisplay = document.getElementById('distanceDisplay');
+
+                if (result) {
+                    sinrDisplay.innerHTML = `<div>SINR(dB)</div><div>${result.sinr_dB.toFixed(2)}</div>`;
+                    distanceDisplay.innerHTML = `<div>d(m)</div><div>${result.distance_m.toFixed(2)}</div>`;
+                } else {
+                    sinrDisplay.innerHTML = `<div>SINR(dB)</div><div>--</div>`;
+                    distanceDisplay.innerHTML = `<div>d(m)</div><div>--</div>`;
+                }
+            }
+            
+            function updateSinrVsDistanceChart() {
+                const grouping = controls.colorGrouping.value;
+                const dataPoints = simState.sinrHistory;
+                const pointColors = [];
+                
+                for(const point of dataPoints) {
+                    if (grouping === 'sector') {
+                        pointColors.push(sectorColors[point.sector] || sectorColors[0]);
+                    } else if (grouping === 'bsid') {
+                        pointColors.push(getColorForBsId(point.servingBsId));
+                    } else {
+                        pointColors.push('rgba(255, 99, 132, 0.8)');
+                    }
+                }
+                
+                sinrVsDistanceChart.data.datasets[0].data = dataPoints.map(p => ({
+                    x: p.distance_m,
+                    y: p.sinr_dB
+                }));
+
+                sinrVsDistanceChart.data.datasets[0].backgroundColor = pointColors;
+                sinrVsDistanceChart.update();
+            }
+
+            function runMonteCarlo(numPoints) {
+                const centralCell = simState.baseStations.find(bs => bs.q === 0 && bs.r === 0);
+                if (!centralCell) return [];
+                const results = [];
+                for (let i = 0; i < numPoints; i++) {
+                    const angle = Math.random() * 2 * Math.PI;
+                    const radius = Math.sqrt(Math.random()) * simState.cellRadiusPixels; 
+                    const user = { x: centralCell.x + radius * Math.cos(angle), y: centralCell.y + radius * Math.sin(angle) };
+                    const result = calculateSINR(user);
+                    if (result) results.push(result);
+                }
+                return results;
+            }
+
+            function plotCDF(sinrValues, legendText) {
+                sinrValues.sort((a, b) => a - b);
+                const cdfData = [];
+                const labels = [];
+                for (let i = 0; i < sinrValues.length; i++) {
+                    labels.push(sinrValues[i].toFixed(2));
+                    cdfData.push((i + 1) / sinrValues.length);
+                }
+                
+                cdfChart.data.labels = labels;
+                cdfChart.data.datasets[0].data = cdfData;
+                
+                const legendDiv = document.getElementById('cdfChartLegend');
+                legendDiv.textContent = legendText;
+
+                cdfChart.update();
+                cdfModal.style.display = 'flex';
+                
+                controls.report.disabled = false;
+            }
+            
+            function resetSimulation() {
+                simState.isDragging = false;
+                simState.sinrHistory = [];
+                controls.report.disabled = true;
+                bsColorMap = {};
+                
+                const baseRadius = 500; 
+                const baseFitFactor = 5; 
+                const currentRadius = parseFloat(controls.cellRadius.value) || baseRadius; 
+                const newFitFactor = (baseRadius / currentRadius) * baseFitFactor;
+                const effectiveFitFactor = Math.max(newFitFactor, 1.5); 
+                simState.cellRadiusPixels = canvas.width / (2 * effectiveFitFactor);
+
+                generateBaseStations();
+                markCoChannelCells();
+
+                const centralCell = simState.baseStations.find(bs => bs.q === 0 && bs.r === 0);
+                if(centralCell) {
+                    simState.mobileUser = { x: centralCell.x, y: centralCell.y, servingBs: null };
+                    const initialResult = calculateSINR(simState.mobileUser);
+                     if (initialResult) {
+                        simState.sinrHistory = [initialResult];
+                        updateReadingWindows(initialResult);
+                        updateOutput(initialResult);
+                     }
+                } else {
+                     simState.mobileUser = { x: canvas.width / 2, y: canvas.height/2, servingBs: null };
+                }
+
+                updateSinrVsDistanceChart();
+                draw();
+            }
+
+            function handleCdfPlot() {
+                let sinrValues;
+                const envText = controls.environment.options[controls.environment.selectedIndex].text;
+                const reuseValue = controls.reuse.value;
+                const legendText = `${envText} N = ${reuseValue}`;
+
+                if (controls.autoPlot.checked) {
+                    const results = runMonteCarlo(26);
+                    if (results.length === 0) {
+                        alert("Could not generate data for the plot.");
+                        return;
+                    }
+                    sinrValues = results.map(r => r.sinr_dB);
+                } else {
+                    const minPoints = 25;
+                    if (simState.sinrHistory.length < minPoints) {
+                        alert(`You have only collected ${simState.sinrHistory.length} points. Please drag the mobile icon to collect at least ${minPoints} points.`);
+                        return;
+                    }
+                    sinrValues = simState.sinrHistory.map(r => r.sinr_dB);
+                }
+
+                plotCDF(sinrValues, legendText);
+            }
+            
+            function handleReport() {
+                const { jsPDF } = window.jspdf;
+
+                const reportContainer = document.createElement('div');
+                reportContainer.style.position = 'absolute';
+                reportContainer.style.left = '-9999px';
+                reportContainer.style.width = '210mm';
+                reportContainer.style.padding = '10mm';
+                reportContainer.style.backgroundColor = 'white';
+
+                document.body.appendChild(reportContainer);
+
+                const reportParams = [
+                    { label: 'PL Model', value: controls.environment.options[controls.environment.selectedIndex].text },
+                    { label: 'Beam Width', value: `${controls.beamWidth.value} deg` },
+                    { label: 'Rotate', value: `${controls.rotate.value} deg` },
+                    { label: 'Cell Radius', value: `${controls.cellRadius.value} m` },
+                    { label: 'Tx Power', value: `${controls.txPower.value} dBm` },
+                    { label: 'fc', value: `${controls.fc.value} GHz` },
+                    { label: 'hTX', value: `${controls.ht.value} m` },
+                    { label: 'hRX', value: `${controls.hr.value} m` },
+                    { label: 'Sigma', value: `${controls.shadowingStdDev.value} dB` },
+                    { label: 'Vertical Tilt', value: `${controls.verticalTilt.value} deg` },
+                    { label: 'np', value: controls.pathLossExp.value },
+                    { label: 'Sectoring', value: controls.sectorized.checked ? 'Yes' : 'No' },
+                    { label: 'Shadowing', value: controls.shadowing.checked ? 'Yes' : 'No' },
+                    { label: 'Reuse', value: controls.reuse.value },
+                ];
+
+                const paramsHtml = reportParams.map(p => `
+                    <tr>
+                        <td style="background-color: #ef4444; color: white; font-weight: bold; padding: 4px; border: 1px solid #9ca3af; font-size: 12px;">${p.label}</td>
+                        <td style="padding: 4px; border: 1px solid #9ca3af; font-size: 12px; text-align: center;">${p.value}</td>
+                    </tr>
+                `).join('');
+
+                const cdfImage = cdfChart.toBase64Image();
+                const dateString = new Date().toLocaleString();
+                const legendText = document.getElementById('cdfChartLegend').textContent;
+
+                reportContainer.innerHTML = `
+                    <div style="font-family: sans-serif;">
+                        <header style="margin-bottom: 1rem;">
+                            <h1 style="font-size: 1.25rem; font-weight: bold;">Fading Channels & Mobile Communications</h1>
+                            <h2 style="font-size: 1.125rem;">IIT Kharagpur</h2>
+                            <div style="font-size: 0.875rem; color: #4b5563;">
+                                <div>Date: ${dateString}</div>
+                                <div style="margin-top: 1rem;"><b>Exp 7: Sectoring</b></div>
+                                <div>Name: ${simState.userName}</div>
+                            </div>
+                        </header>
+                        <hr style="border-color: black; margin-bottom: 2rem;">
+
+                        <main style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
+                            <div>
+                                <h3 style="text-align: center; font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">CDF of SINR</h3>
+                                <img src="${cdfImage}" alt="CDF Plot" style="width: 100%;">
+                                <div style="border: 1px solid #ccc; text-align: center; padding: 4px; margin: 0 auto; margin-top: 8px; font-weight: bold; width: 120px;">${legendText}</div>
+                            </div>
+                            <div>
+                                <table style="width: 100%; border-collapse: collapse; border: 1px solid #9ca3af;">
+                                    ${paramsHtml}
+                                </table>
+                            </div>
+                        </main>
+
+                        <footer style="margin-top: 6rem; display: flex; justify-content: space-between; font-size: 0.875rem;">
+                            <div>
+                                <p>(Signature of ${simState.userName})</p>
+                                <div style="margin-top: 0.5rem; border-top: 1px solid black; width: 12rem;"></div>
+                            </div>
+                            <div>
+                                <p>(Signature of Faculty)</p>
+                                <div style="margin-top: 0.5rem; border-top: 1px solid black; width: 12rem;"></div>
+                            </div>
+                        </footer>
+                    </div>
+                `;
+
+                setTimeout(() => {
+                    html2canvas(reportContainer, { scale: 2 }).then(canvas => {
+                        const imgData = canvas.toDataURL('image/png');
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const canvasWidth = canvas.width;
+                        const canvasHeight = canvas.height;
+                        const ratio = canvasHeight / canvasWidth;
+                        const imgHeight = pdfWidth * ratio;
+                        
+                        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
+                        pdf.save('report.pdf');
+
+                        document.body.removeChild(reportContainer);
+                    });
+                }, 500);
+            }
+
+            function resetControlsToDefaults() {
+                controls.environment.value = 'rune';
+                controls.reuse.value = '1';
+                controls.beamWidth.value = '120'; // Default to 120
+                controls.rotate.value = 0;
+                controls.cellRadius.value = 500;
+                controls.txPower.value = 41;
+                controls.fc.value = 2.0;
+                controls.ht.value = 10;
+                controls.hr.value = 1.5;
+                controls.verticalTilt.value = 6;
+                controls.sectorized.checked = true;
+                controls.shadowing.checked = true;
+                controls.grid.checked = true;
+                controls.autoPlot.checked = false;
+            }
+
+            function handleEnvironmentChange() {
+                const selectedEnv = controls.environment.value;
+                const params = environmentParams[selectedEnv];
+                
+                if(params) {
+                    controls.pathLossExp.value = params.np;
+                    controls.shadowingStdDev.value = params.sigma;
+                    controls.pathLossExp.disabled = true;
+                    controls.shadowingStdDev.disabled = true;
+                }
+                resetSimulation();
+            }
+            
+            function handleMouseDown(event) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = event.clientX - rect.left;
+                const mouseY = event.clientY - rect.top;
+                
+                const dx = mouseX - simState.mobileUser.x;
+                const dy = mouseY - simState.mobileUser.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+
+                if (dist < 15) {
+                    simState.isDragging = true;
+                    canvas.style.cursor = 'grabbing';
+                }
+            }
+
+            function handleMouseMove(event) {
+                if (!simState.isDragging) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                simState.mobileUser.x = event.clientX - rect.left;
+                simState.mobileUser.y = event.clientY - rect.top;
+
+                const result = calculateSINR(simState.mobileUser);
+                if (result) {
+                    updateOutput(result);
+                    updateReadingWindows(result);
+                }
+                draw();
+            }
+
+            function handleMouseUp() {
+                if(simState.isDragging) {
+                    simState.isDragging = false;
+                    canvas.style.cursor = 'grab';
+
+                    const result = calculateSINR(simState.mobileUser);
+                    if (result) {
+                        simState.sinrHistory.push(result);
+                        updateSinrVsDistanceChart();
+                    }
+                }
+            }
+
+            function setup() {
+                const container = canvas.parentElement;
+                const size = Math.min(container.clientWidth, container.clientHeight);
+                canvas.width = size;
+                canvas.height = size;
+
+                populateReuseSelector();
+
+                canvas.addEventListener('mousedown', handleMouseDown);
+                canvas.addEventListener('mousemove', handleMouseMove);
+                canvas.addEventListener('mouseup', handleMouseUp);
+                canvas.addEventListener('mouseout', handleMouseUp);
+
+                resetBtn.addEventListener('click', () => {
+                    cdfModal.style.display = 'none';
+                    resetControlsToDefaults();
+                    handleEnvironmentChange();
+                });
+                cdfPlotBtn.addEventListener('click', handleCdfPlot);
+                reportBtn.addEventListener('click', handleReport);
+                closeCdfModalBtn.addEventListener('click', () => cdfModal.style.display = 'none');
+                
+                Object.values(controls).forEach(control => {
+                    const resetOnChange = ['reuse', 'beamWidth', 'rotate', 'txPower', 'fc', 'ht', 'hr', 'verticalTilt', 'sectorized', 'shadowing', 'grid', 'autoPlot'];
+                    if (resetOnChange.includes(control.id)) { 
+                        control.addEventListener('change', resetSimulation);
+                    }
+                });
+
+                controls.cellRadius.addEventListener('input', resetSimulation);
+                controls.environment.addEventListener('change', handleEnvironmentChange);
+                controls.colorGrouping.addEventListener('change', updateSinrVsDistanceChart);
+                
+                submitNameBtn.addEventListener('click', () => {
+                   const name = userNameInput.value.trim();
+                   if (name) {
+                       simState.userName = name;
+                       nameModal.style.display = 'none';
+                   }
+                });
+
+                initCharts();
+                handleEnvironmentChange();
+            }
+
+            setup();
+        });
+    </script>
+<script src="../assets/js/iframeResize.js"></script>
+        
+        </body>
+</html>
